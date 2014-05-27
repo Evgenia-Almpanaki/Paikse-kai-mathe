@@ -10,37 +10,48 @@ import javax.swing.JOptionPane;
 public class QuestionManager_Geography implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
-	
-	private ArrayList<Question_Geography> questions;
+
+	private ArrayList<Question_Geography> questionsGreece;
+	private ArrayList<Question_Geography> questionsEurope;
 	
 	public QuestionManager_Geography(){
-		
-		questions = new ArrayList<Question_Geography>();
+
+		questionsGreece = new ArrayList<Question_Geography>();
+		questionsEurope = new ArrayList<Question_Geography>();
 	}
-	
-	public void showQuestionsOnScreen(JFrame j){
 		
-		String s="Questions                                          Point\n";
-		
-		for(Question_Geography q: questions){
-			s+=q.getQuestion()+"   ("+q.getPoint().x+","+q.getPoint().y+")\n";
-		}
-		
-		JOptionPane.showMessageDialog(j, s, "List of Questions", JOptionPane.INFORMATION_MESSAGE);
+	public void addQuestionGreece(String q,Point p){
+		questionsGreece.add(new Question_Geography(q,p));
 	}
-	
-	public void addQuestion(String q,Point p){
-		questions.add(new Question_Geography(q,p));
+	public void addQuestionEurope(String q,Point p){
+		questionsEurope.add(new Question_Geography(q,p));
 	}
 
-	public ArrayList<Question_Geography> getQuestions() {
-		return questions;
+	public ArrayList<Question_Geography> getQuestionsGreece() {
+		return questionsGreece;
+	}
+
+	public ArrayList<Question_Geography> getQuestionsEurope() {
+		return questionsEurope;
 	}
 	
 
-	public Question_Geography getNextQuestion(Question_Geography q){
+	public Question_Geography getNextQuestionGreece(Question_Geography q){
 		boolean done=false;
-		for(Question_Geography ques: questions){
+		for(Question_Geography ques: questionsGreece){
+			if(done==true)
+				return ques;
+			if(ques.getQuestion().equals(q.getQuestion())){
+				done =true;
+			}
+		}
+		return null;
+		
+	}
+	
+	public Question_Geography getNextQuestionEurope(Question_Geography q){
+		boolean done=false;
+		for(Question_Geography ques: questionsEurope){
 			if(done==true)
 				return ques;
 			if(ques.getQuestion().equals(q.getQuestion())){
