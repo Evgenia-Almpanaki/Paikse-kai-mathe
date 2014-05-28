@@ -2,11 +2,12 @@ package GameState;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.ObjectInputStream;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 import Entity.QuestionManager_Geography;
+import Entity.Question_Geography;
 import Main.GamePanel;
 
 
@@ -28,8 +29,39 @@ public class GameGeographyState extends GameState{
 		imagePath="/1/greece.jpg";
 
 		questionManager=loadQuestions("Data/"+questionsFile);
+		save();
 
 		game=new GameGeographySubState(backgroundPath, imagePath , questionManager,gsm);
+	}
+
+	private void save() {
+		try {
+			FileWriter fr=new FileWriter("questions_Geography1.txt");
+			PrintWriter pr=new PrintWriter(fr);
+			
+			pr.println("Questions - Greece");
+			for(Question_Geography q: questionManager.getQuestionsGreece()){
+				pr.println(q.getQuestion());
+				pr.println(   (   (q.getPoint().x ) *1000)/width          ) ;
+				pr.println(   (   (q.getPoint().y ) *1000)/height         );
+			}
+			
+			pr.println("Questions - Europe");
+			for(Question_Geography q: questionManager.getQuestionsEurope()){
+				pr.println(q.getQuestion());
+				pr.println(   (   (q.getPoint().x ) *1000)/width          ) ;
+				pr.println(   (   (q.getPoint().y ) *1000)/height         );
+			
+			}
+			
+			pr.close();
+			fr.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public QuestionManager_Geography loadQuestions(String file){
@@ -39,13 +71,13 @@ public class GameGeographyState extends GameState{
 			BufferedReader in = new BufferedReader(fr);
 			String s;
 			int x,y;
-			
+
 			do{
 				s=in.readLine();
 			}while(!s.trim().equals("Questions - Greece"));
-			
+
 			while(!(s=in.readLine()).trim().equals("Questions - Europe")){
-				
+
 				x=Integer.parseInt(in.readLine());
 				y=Integer.parseInt(in.readLine());
 				questionManager.addQuestionGreece(s, new Point(x,y));
@@ -54,15 +86,15 @@ public class GameGeographyState extends GameState{
 			while(!s.trim().equals("Questions - Europe")){
 				s=in.readLine();
 			}
-			
+
 			while(in.ready()){
 				s=in.readLine();
 				x=Integer.parseInt(in.readLine());
 				y=Integer.parseInt(in.readLine());
 				questionManager.addQuestionEurope(s, new Point(x,y));
-				
+
 			}
-			
+
 			in.close();
 			fr.close();
 		}
