@@ -11,6 +11,7 @@ public class Question_Geography implements Serializable{
 	private Point pos; 
 	private boolean selected;
 	private boolean asked;
+	private boolean answered;
 	
 	public Question_Geography(String q,Point p){
 		question=q;
@@ -19,6 +20,14 @@ public class Question_Geography implements Serializable{
 		asked=false;
 	}
 	
+	public boolean isAnswered() {
+		return answered;
+	}
+
+	public void setAnswered(boolean answered) {
+		this.answered = answered;
+	}
+
 	public boolean isAsked() {
 		return asked;
 	}

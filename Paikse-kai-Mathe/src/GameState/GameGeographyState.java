@@ -1,76 +1,77 @@
 package GameState;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
+import Background.Background;
+import Entity.GameButton;
+import Entity.MessageBox;
+import Entity.Player;
 import Entity.QuestionManager_Geography;
+import Entity.Question_Geography;
+import Main.GamePanel;
 
 
 public class GameGeographyState extends GameState{
 
-	private static final String questionsFile="questions_Geography.txt";
-
 	private QuestionManager_Geography questionManager;
 	private String imagePath, backgroundPath;
 	private int difficulty=0;
-	private GameGeographySubState game;
+	private Background background;
+	private BufferedImage image;
+	private int xImage, yImage;
+	private Player player;
+	private MessageBox messageBox;
+	private GameButton checkButton, ignoreButton;
+	private Question_Geography currentQuestion;
+	private boolean displayMessage;
+	private GameStateManager gsm;
+	private boolean once=false;
+	private int width = GamePanel.WIDTH;
+	private int height = GamePanel.HEIGHT;
 
 	public GameGeographyState(GameStateManager gsm){
 		this.gsm = gsm;
 		backgroundPath="/Backgrounds/geo.jpg";
 		imagePath="/1/greece.jpg";
+		questionManager=new QuestionManager_Geography();
+		questionManager.loadQuestions();
+		once=true;
 
-		questionManager=loadQuestions("Data/"+questionsFile);
-		
-		game=new GameGeographySubState(backgroundPath, imagePath , questionManager,gsm);
-	}
+		// buttons
+		ignoreButton = new GameButton("/Textures/buttonNext.png");
+		ignoreButton.setX(GamePanel.WIDTH - ignoreButton.getWidth() - 10);
+		ignoreButton.setY(GamePanel.HEIGHT - ignoreButton.getHeight() - 10);
 
-	
-	public QuestionManager_Geography loadQuestions(String file){
-		questionManager= new QuestionManager_Geography();
-		try{
-			FileReader fr=new FileReader(file);
-			BufferedReader in = new BufferedReader(fr);
-			String s;
-			int x,y;
+		checkButton = new GameButton("/Textures/buttonCheck.png");
+		checkButton.setX(GamePanel.WIDTH - checkButton.getWidth() - 10);
+		checkButton.setY(ignoreButton.getY() - checkButton.getHeight() - 10);
 
-			do{
-				s=in.readLine();
-			}while(!s.trim().equals("Questions - Greece"));
+		//x, y of image
+		xImage=GamePanel.WIDTH/2;
+		yImage=GamePanel.HEIGHT/4;
 
-			while(!(s=in.readLine()).trim().equals("Questions - Europe")){
+		//init background
+		background = new Background(backgroundPath, 1);
+		background.setVector(0, 0);
 
-				x=Integer.parseInt(in.readLine());
-				y=Integer.parseInt(in.readLine());
-				questionManager.addQuestionGreece(s, new Point(x,y));
-			}
-
-			while(!s.trim().equals("Questions - Europe")){
-				s=in.readLine();
-			}
-
-			while(in.ready()){
-				s=in.readLine();
-				x=Integer.parseInt(in.readLine());
-				y=Integer.parseInt(in.readLine());
-				questionManager.addQuestionEurope(s, new Point(x,y));
-
-			}
-
-			in.close();
-			fr.close();
-			
-		}
-		catch(Exception e){
+		//init image
+		try {
+			image=ImageIO.read(getClass().getResourceAsStream(imagePath));
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return questionManager;
-	}
 
-	@Override
-	public void init() {
-		game.init();
+		//init messageBox
+		messageBox = new MessageBox();
+		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
+		displayMessage = false;
+
 
 	}
 
@@ -83,39 +84,201 @@ public class GameGeographyState extends GameState{
 		else if(difficulty==2){
 			imagePath="/2/europe.jpg";
 		}
-		game.setImagePath(imagePath);
-		game.update();
+		try {
+			image=ImageIO.read(getClass().getResourceAsStream(imagePath));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
-
-	@Override
-	public void render(Graphics2D g) {
-		game.render(g);
-
-	}
-
-	@Override
-	public void keyPressed(int keyCode) {
-		game.keyPressed(keyCode);
-	}
-
-	@Override
-	public void keyReleased(int keyCode) {
-		game.keyReleased(keyCode);
-	}
-
-	@Override
 	public void mouseClicked(int mouseType, int x, int y) {
-		game.mouseClicked(mouseType, x, y);
+
+		if(checkButton.isClicked(x, y)){
+			currentQuestion.setAnswered(true);
+
+			displayMessage = true; 
+			if(currentQuestion.isSelected() ){
+				currentQuestion.setSelected(false);
+				messageBox.setMessage("Σωστό!");	
+				player.setTempScore(player.getTempScore()+1);
+			}
+			else{
+				messageBox.setMessage("Λάθος!");
+				if(difficulty==1){
+					for(Question_Geography q:questionManager.getQuestionsGreece()){
+						q.setSelected(false);
+					}
+				}
+				else{
+					for(Question_Geography q:questionManager.getQuestionsEurope()){
+						q.setSelected(false);
+					}
+				}
+				currentQuestion.setSelected(true);
+			}
+			if(difficulty==1)
+				currentQuestion=questionManager.getNextQuestionGreece(currentQuestion);
+			else if(difficulty==2)
+				currentQuestion=questionManager.getNextQuestionEurope(currentQuestion);
+		}
+		else if(ignoreButton.isClicked(x, y)){ 
+			if(difficulty==1){
+				currentQuestion=questionManager.getNextQuestionGreece(currentQuestion);
+				for(Question_Geography q:questionManager.getQuestionsGreece()){
+					q.setSelected(false);
+				}
+			}else if(difficulty==2){
+				currentQuestion=questionManager.getNextQuestionEurope(currentQuestion);
+				for(Question_Geography q:questionManager.getQuestionsEurope()){
+					q.setSelected(false);
+				}
+			}
+		} 
+		else if(displayMessage && messageBox.isOkButtonClicked(x, y)){ 
+			displayMessage= false; 
+		} 
+		else{
+			String selectedQuestion = null;
+
+
+			if(difficulty==1){
+
+				for(Question_Geography q:questionManager.getQuestionsGreece()){
+
+					int minx=(int)(q.getPoint().x *(width/1000.0));
+					int miny=(int)(q.getPoint().y *(height/1000.0));
+					int maxx=10+(int)(q.getPoint().x *(width/1000.0));
+					int maxy=10+(int)(q.getPoint().y *(height/1000.0));
+
+					if(x>minx && y>miny && x<maxx && y<maxy){
+						selectedQuestion=q.getQuestion();
+					}
+				}
+				for(Question_Geography q:questionManager.getQuestionsGreece()){
+					if(q.getQuestion().equals(selectedQuestion)) 
+						q.setSelected(true); 
+					else 
+						q.setSelected(false);
+				}
+			}
+			else if(difficulty==2){
+
+				for(Question_Geography q:questionManager.getQuestionsEurope()){
+
+					int minx=(int)(q.getPoint().x *(width/1000.0));
+					int miny=(int)(q.getPoint().y *(height/1000.0));
+					int maxx=10+(int)(q.getPoint().x *(width/1000.0));
+					int maxy=10+(int)(q.getPoint().y *(height/1000.0));
+
+					if(x>minx && y>miny && x<maxx && y<maxy){
+						selectedQuestion=q.getQuestion();
+					}
+				}
+				for(Question_Geography q:questionManager.getQuestionsEurope()){
+					if(q.getQuestion().equals(selectedQuestion)) 
+						q.setSelected(true); 
+					else 
+						q.setSelected(false);
+				}
+			}
+
+
+		}
+
+	}
+	public void render(Graphics2D g) {
+
+		boolean done = false;
+
+		background.render(g);
+		g.drawImage(image, xImage, yImage,GamePanel.WIDTH/2,3 * (GamePanel.HEIGHT/4),null);
+
+		if(currentQuestion==null && !displayMessage) {
+			g.drawString("Δεν υπάρχουν άλλες ερωτήσεις",GamePanel.WIDTH/3, GamePanel.HEIGHT/8 );
+			done=true;
+		}
+
+		if(done){
+			done=false;
+			displayMessage=false;
+			gsm.setState(GameStateManager.GAME_OVER_STATE);
+
+		}
+		g.setColor(Color.MAGENTA);
+		g.drawString("Βαθμοί: "+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
+
+
+		if (displayMessage)
+			messageBox.render(g);
+		else {
+			renderQuestions(g);
+			checkButton.render(g);
+			ignoreButton.render(g);
+
+		}
 	}
 
-	@Override
+	public void renderQuestions(Graphics g) {
+		g.setColor(Color.red);
+		if(currentQuestion!=null){
+			// draw question
+			g.drawString(currentQuestion.getQuestion(), GamePanel.WIDTH/3, GamePanel.HEIGHT/8);
+
+			// draw answers
+			if(difficulty==1){
+				for(Question_Geography q:questionManager.getQuestionsGreece()){ 
+					if(q.isSelected())
+						g.setColor(Color.GREEN); 
+					else 
+						g.setColor(Color.red);
+					g.fillOval((int)(q.getPoint().x*(width/1000.0)),(int) (q.getPoint().y*(height/1000.0)), 10, 10);
+				}
+			}
+			else if(difficulty==2){
+				for(Question_Geography q:questionManager.getQuestionsEurope()){ 
+					if(q.isSelected())
+						g.setColor(Color.GREEN); 
+					else 
+						g.setColor(Color.red);
+					g.fillOval((int)(q.getPoint().x*(width/1000.0)),(int) (q.getPoint().y*(height/1000.0)), 10, 10);
+				}
+			}
+		}
+	}
+	public void init() {
+
+		questionManager.init();
+		difficulty=gsm.getDifficulty();
+		player = gsm.getPlayer();
+
+		if(once && difficulty==1){
+			if(questionManager.getQuestionsGreece().size()>0)
+				currentQuestion = questionManager.getNextQuestionGreece(new Question_Geography("", new Point(0,0)));
+		}
+		else if(once && difficulty==2){
+			if(questionManager.getQuestionsEurope().size()>0)
+				currentQuestion = questionManager.getNextQuestionEurope(new Question_Geography("", new Point(0,0)));
+		}
+	}
+
+
+	public void setImagePath(String img){
+		imagePath=img;
+	}
+
+	public void keyPressed(int keyCode) {
+
+	}
+
+	public void keyReleased(int keyCode) {
+
+	}
+
 	public void mouseDragged() {
-		game.mouseDragged();
+
 	}
 
-	@Override
 	public void mouseMoved(int x, int y) {
-		game.mouseMoved(x, y);
+
 	}
 }
