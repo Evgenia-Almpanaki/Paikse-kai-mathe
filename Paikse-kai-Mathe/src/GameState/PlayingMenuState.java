@@ -16,8 +16,8 @@ public class PlayingMenuState extends GameState {
 	public PlayingMenuState(GameStateManager gsm){
 		this.gsm = gsm;
 		
-		bg = new Background("/Backgrounds/menubg.gif", 1);
-		bg.setVector(0, 1);
+		bg = new Background("/Backgrounds/games_menu_bg.gif", 1);
+		bg.setVector(0, 0);
 		
 		title = "Διάλεξε Παιχνίδι!";
 	}
@@ -35,8 +35,8 @@ public class PlayingMenuState extends GameState {
 	public void render(Graphics2D g) {
 		bg.render(g);
 		g.drawString(title, 100, 100);
-		if(options == null)
-			options = new SubjectOptions(gsm.getDifficulty());
+		//if(options == null)
+			//options = new SubjectOptions(gsm.getDifficulty());
 		options.render(g);
 	}
 
@@ -46,6 +46,7 @@ public class PlayingMenuState extends GameState {
 
 	public void mouseClicked(int mouseType, int x, int y) {
 		int option = options.subjectClicked(x, y);
+		gsm.getThread().suspend();//
 		if(option == 0){
 			gsm.setState(GameStateManager.GAME_HISTORY_STATE);
 		}
@@ -58,6 +59,7 @@ public class PlayingMenuState extends GameState {
 		else if(option == 2){
 			gsm.setState(GameStateManager.GAME_MATH_STATE);
 		}
+		gsm.getThread().resume();//
 	}
 
 	public void mouseDragged() {}

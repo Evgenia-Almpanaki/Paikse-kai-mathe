@@ -9,16 +9,27 @@ import javax.imageio.ImageIO;
 
 import Main.GamePanel;
 
+/* Αυτή η κλάση αναπαριστά ένα textfield του παιχνιδιού. Κατα την δημιουργία ενός τέτοιου αντικειμένου,
+ * δίνεται και η διεύθηνση προορισμού μιας εικόνας, για την υλοποίηση του textfield. Το textfield μπορεί 
+ * να κρατήσει το μεγεθός του και τις συντεταγμένες στις οποίες θα ζωγραφιστεί πάνω στην οθόνη, για λόγους
+ *αναγνώρισης του.
+ */
+
 public class GameTextField {
 
+	//image drawing fields
 	private BufferedImage image;
 	private int x;
 	private int y;
 	private int width;
 	private int height;
+	
+	//text input to the field
 	private String input;
 	private String tempInput;
 	
+	
+	//constructor
 	public GameTextField(String path){
 		
 		try{
@@ -35,6 +46,7 @@ public class GameTextField {
 		
 	}
 	
+	//getters and setters
 	public int getX(){return x;}
 	public int getY(){return y;}
 	public int getWidth(){return width;}
@@ -44,8 +56,10 @@ public class GameTextField {
 	public void setX(int x){this.x = x;}
 	public void setY(int y){this.y = y;}
 	
+	
 	public void update(){}
 	
+	//draw textfield to screen
 	public void render(Graphics2D g){
 		g.drawImage(image, x, y, null);
 		
@@ -75,6 +89,8 @@ public class GameTextField {
 		}*/
 	}
 	
+	
+	//event for typing input
 	public void keyPressed(int keyCode){
 		
 		if(keyCode >= 65 && keyCode <= 90){

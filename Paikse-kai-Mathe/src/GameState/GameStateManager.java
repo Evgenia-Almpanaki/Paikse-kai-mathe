@@ -30,6 +30,8 @@ public class GameStateManager {
 	public static final int GAME_GEOGRAPHY_STATE = 9;
 	public static final int GAME_MATH_STATE = 10;
 	
+	/*prosorino*/ private Thread thread;
+	
 	//constructor
 	public GameStateManager(){
 		
@@ -41,10 +43,13 @@ public class GameStateManager {
 		
 	}
 	
+	/*prosorino*/ public void setThread(Thread thread){this.thread = thread;}
+				  public Thread getThread(){return thread;}
+	
 	private void generateStates(){
 		gameStates.add(new MenuState(this));
 		gameStates.add(new ScoreDisplayState("",this));
-		gameStates.add(new PauseMenuState());
+		gameStates.add(new PauseMenuState(this));
 		gameStates.add(new InputState(this));
 		gameStates.add(new DifficultyState(this));
 		gameStates.add(new PlayingMenuState(this));

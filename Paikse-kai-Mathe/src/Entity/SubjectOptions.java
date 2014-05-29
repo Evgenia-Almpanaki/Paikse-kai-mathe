@@ -10,14 +10,23 @@ import GameState.DifficultyState;
 import Main.Game;
 import Main.GamePanel;
 
+/*
+ * Αυτή η κλάση δημιουργεί μενού μαθημάτων, δηλαδή ένα μενού όπου ο παίχτης θα επιλέγει
+ * πιο παιχνίδι θα παίξει. Κάθε μάθημα αναπαριστάται με μια εικονίτσα σχετικά με αυτό.
+ * Επίσης, κάθε εικονίτσα κρατάει το μεγεθός και τις συντεταγμένες της, ώστε να μπορεί
+ * να ταυτοποιηθεί σε δίαφορους ελέγχους.
+ */
+
 public class SubjectOptions {
 
+	//fields
 	private BufferedImage[] images;
 	private int[] widths;
 	private int[] heights;
 	private int[] x;
 	private int[] y;
 	
+	//constructor
 	public SubjectOptions(int difficulty){
 		 
 		try{
@@ -78,6 +87,7 @@ public class SubjectOptions {
 		}
 	}
 	
+	//checks if and which of the subjects is clicked
 	public int subjectClicked(int x,int y){
 		int subject = -1;
 		
@@ -92,6 +102,7 @@ public class SubjectOptions {
 		return subject;
 	}
 	
+	//draws all the subjects options
 	public void render(Graphics2D g){
 		
 		for(int i=0;i<images.length;i++){

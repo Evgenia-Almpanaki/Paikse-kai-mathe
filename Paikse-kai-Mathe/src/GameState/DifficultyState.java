@@ -11,6 +11,12 @@ import Background.Background;
 import Entity.MenuOptions;
 import Main.GamePanel;
 
+/*
+ * Η κλάση αυτή είναι μια κατάσταση του παιχνιδιού, η κατάσταση στην οποία ο παίχτης 
+ * καλείται να επιλέξει την δυσκολία του παιχνιδιού, δηλαδή την τάξη του δημοτικού που επιθημεί.
+ * 
+ */
+
 public class DifficultyState extends GameState {
 	
 	//background
@@ -51,10 +57,12 @@ public class DifficultyState extends GameState {
 	
 	public void init() {}
 
+	//updates the game
 	public void update() {
 		bg.update();
 	}
 
+	//draws stuff for this state
 	public void render(Graphics2D g) {
 		
 		//draw background
@@ -84,6 +92,7 @@ public class DifficultyState extends GameState {
 		}
 	}
 	
+	//sets the new state that has been selected
 	private void select(){
 		
 		if(currentMenuChoise == 0)
@@ -93,10 +102,13 @@ public class DifficultyState extends GameState {
 		else if(currentMenuChoise == 2)
 			gsm.setDifficulty(EKTH_DHMOTIKOU);
 		
+		gsm.getThread().suspend();//
 		gsm.setState(GameStateManager.PLAYING_MENU_STATE);
+		gsm.getThread().resume();//
 		
 	}
 
+	//keyboard input
 	public void keyPressed(int keyCode) {
 		
 		if(keyCode == KeyEvent.VK_ENTER){
@@ -115,6 +127,7 @@ public class DifficultyState extends GameState {
 
 	public void keyReleased(int keyCode) {}
 
+	//mouse input
 	public void mouseClicked(int mouseType, int x, int y) {
 		if(mouseType == MouseEvent.BUTTON1){
 			int choise = options.checkIfOptionIsClicked(x, y);
@@ -127,6 +140,7 @@ public class DifficultyState extends GameState {
 
 	public void mouseDragged() {}
 
+	//mouse input
 	public void mouseMoved(int x, int y) {
 		int choise = options.checkIfOptionIsClicked(x, y);
 		if(choise != -1){

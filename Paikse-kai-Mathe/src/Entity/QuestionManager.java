@@ -25,6 +25,7 @@ import Main.GamePanel;
 public class QuestionManager {
 
 	private ArrayList<Question> questionList;
+	private ArrayList<Question> skippedQuestionsList;
 	
 	private int currentQuestionIndex=0;
 	private int currentAnswer = -1;
@@ -35,8 +36,9 @@ public class QuestionManager {
 	
 	public QuestionManager(String subject, int difficulty){
 		questionList = new ArrayList<Question>();
+		skippedQuestionsList = new ArrayList<Question>();
 		questionFont = new Font("Arial", Font.BOLD, 30);
-		questionColor = Color.ORANGE;
+		questionColor = Color.GREEN.darker();
 		choosenAnswer = Color.BLACK;
 		
 		generateManager(subject, difficulty);
@@ -49,7 +51,7 @@ public class QuestionManager {
 	public int getCurrentAnswer(){return currentAnswer;}
 	public int guestionListLength(){return questionList.size();}
 	public int size(){return questionList.size();}
-
+	public int skippedListSize(){return skippedQuestionsList.size();}
 	
 	public void resetCurrentQuestionIndex(){currentQuestionIndex = 0;}
 	public void resetCurrentAnswer(){currentAnswer = -1;}
@@ -82,8 +84,15 @@ public class QuestionManager {
 	}
 	
 	public void getNextQuestion(){
-		if(questionList.size() > currentQuestionIndex){
-			currentQuestionIndex++;
+		
+		if(questionList.size() > 1){
+			skippedQuestionsList.add(questionList.remove(currentQuestionIndex));
+			currentAnswer = -1;
+		}
+		else{
+			skippedQuestionsList.add(questionList.remove(currentQuestionIndex));
+			questionList = skippedQuestionsList;
+			currentQuestionIndex = 0;
 			currentAnswer = -1;
 		}
 	}

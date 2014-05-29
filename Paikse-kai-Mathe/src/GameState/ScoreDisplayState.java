@@ -23,6 +23,8 @@ public class ScoreDisplayState extends GameState {
 	
 	private String [][] scores;
 	
+	private static int previousState;
+	
 	public ScoreDisplayState(String scoreFilePath, GameStateManager gsm){
 		this.gsm = gsm;
 		backButton = new GameButton("/Textures/backButton.png");
@@ -35,7 +37,11 @@ public class ScoreDisplayState extends GameState {
 		title = "Οι Μεγαλύτερες Βαθμολογίες";
 		importScores();
 	}
-
+	
+	public static void setPreviousState(int state){
+		previousState = state;
+	}
+	
 	private void importScores() {
 		
 		try{
@@ -80,7 +86,7 @@ public class ScoreDisplayState extends GameState {
 
 	public void mouseClicked(int mouseType, int x, int y) {
 		if(mouseType == MouseEvent.BUTTON1 && backButton.isClicked(x, y))
-			gsm.setState(GameStateManager.MENU_STATE);
+			gsm.setState(previousState);
 	}
 
 	public void mouseDragged() {}

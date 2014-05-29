@@ -8,17 +8,25 @@ import javax.imageio.ImageIO;
 
 import Main.GamePanel;
 
+/* Αυτή η κλάση αναπαριστά ένα παράθυρο μηνύματος του παιχνιδιού, για την εμφάνισει διαφόρων μηνυμάτων. Κατα την 
+ * δημιουργία ενός τέτοιου αντικειμένου, δίνεται και η διεύθηνση προορισμού μιας εικόνας, για την υλοποίηση του 
+ * παραθύρου αυτού. Περιλαμβάνει και ένα GameButton για το κλείσιμο του παραθύρου.
+ */
+
 public class MessageBox {
 	
+	//stuff to draw
 	private BufferedImage image;
 	private GameButton okButton;
 	private String message;
 	
+	//dimension of images
 	private int width;
 	private int height;
 	private int x;
 	private int y;
 	
+	//constructor
 	public MessageBox(){
 		
 		try{
@@ -36,6 +44,7 @@ public class MessageBox {
 		
 	}
 	
+	//getters and setters
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}
 	
@@ -49,6 +58,7 @@ public class MessageBox {
 		okButton.setY(y + height * 4/5 - okButton.getHeight());
 	}
 	
+	//draw messageBox to screen
 	public void render(Graphics2D g){
 		FontMetrics fm = g.getFontMetrics();
 		
@@ -58,6 +68,7 @@ public class MessageBox {
 		
 	}
 	
+	//checks if button OK is clicked to dispose the messageBox from rendering
 	public boolean isOkButtonClicked(int x, int y){
 		if(okButton.isClicked(x, y))
 			return true;

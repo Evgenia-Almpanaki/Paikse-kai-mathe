@@ -1,8 +1,10 @@
 package GameState;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.List;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,12 +35,17 @@ public class GameHistoryState extends GameState {
 	private GameButton buttonExit;
 	private Player player;
 	private MessageBox messageBox;
+	
+	private boolean hasGameBeenPaused;
 	private boolean displayMessage;
 	
 	private Color scoreColor;
 	
+	private Font font;
+	
 	public GameHistoryState(GameStateManager gsm){
 		this.gsm = gsm;
+		
 		scoreColor = Color.YELLOW;
 		
 		buttonSkip = new GameButton("/Textures/buttonNext.png");
@@ -53,18 +60,26 @@ public class GameHistoryState extends GameState {
 		buttonExit.setX(10);
 		buttonExit.setY(GamePanel.HEIGHT - buttonExit.getHeight() - 10);
 		
-		bg = new Background("/Backgrounds/menubg.gif", 1);
+		bg = new Background("/Backgrounds/history_bg.gif", 1);
 		bg.setVector(0, 0);
 		
 		messageBox = new MessageBox();
 		messageBox.setXandY(GamePanel.WIDTH/2 - messageBox.getWidth()/2, GamePanel.HEIGHT/2 - messageBox.getHeight()/2);
 		displayMessage = false;
+		
+		hasGameBeenPaused = false;
+		
 	}
 
 	public void init() {
-		manager = new QuestionManager("history", gsm.getDifficulty());
-		player = gsm.getPlayer();
-		score = "Σκόρ: " + player.getTempScore();
+		if(!hasGameBeenPaused){
+			manager = new QuestionManager("history", gsm.getDifficulty());
+			player = gsm.getPlayer();
+			score = "Σκόρ: " + player.getTempScore();
+		}
+		else{
+			hasGameBeenPaused = false;
+		}
 	}
 
 	public void update() {}
@@ -162,7 +177,13 @@ public class GameHistoryState extends GameState {
 		
 	}
 
-	public void keyPressed(int keyCode) {}
+	public void keyPressed(int keyCode) {
+		if(keyCode == KeyEvent.VK_ESCAPE){
+			PauseMenuState.setPreviousState(GameStateManager.GAME_HISTORY_STATE);
+			gsm.setState(GameStateManager.PAUSE_MENU_STATE);
+			hasGameBeenPaused = true;
+		}
+	}
 
 	public void keyReleased(int keyCode) {}
 
@@ -186,9 +207,9 @@ public class GameHistoryState extends GameState {
 			
 				manager.resetCurrentAnswer();
 				manager.removeQuestion(manager.getQuestionAtPosition(manager.getCurrentQuestionIndex()));
-				if(manager.size()>0 && manager.getCurrentQuestionIndex() > manager.size()-1){
+				/*if(manager.size()>0 && manager.getCurrentQuestionIndex() > manager.size()-1){
 					manager.resetCurrentQuestionIndex();
-				}
+				}*/
 			}
 			else if(buttonSkip.isClicked(x, y)){
 				manager.getNextQuestion();
@@ -197,13 +218,14 @@ public class GameHistoryState extends GameState {
 				player.setTotalScore(player.getTempScore() + player.getTotalScore());
 				player.setTempScore(0);
 				saveScoreToFile();
-				System.exit(0);
+				System.exit(0);//allagh
 			}
 		}
 		
-		if(manager.size()==0){
+		if(manager.size()==0 && manager.skippedListSize()==0){
 			if(displayMessage)
 				return;
+			saveScoreToFile();
 			gsm.setState(GameStateManager.GAME_OVER_STATE);
 		}
 	}

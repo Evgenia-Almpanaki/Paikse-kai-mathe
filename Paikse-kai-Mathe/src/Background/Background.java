@@ -2,15 +2,16 @@ package Background;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 
 import javax.imageio.ImageIO;
 
 import Main.Game;
 import Main.GamePanel;
 
-/* This class creates a background for the game with the given directory.
- * The background is able to auto-move in a direction we give, as doubles dx and dy.
- * If dx and dy are 0, the background doesn't move.
+/* Αυτή η κλάση δημιουργεί ένα background από μια εικόνα, μιάς δεδομένης διεύθηνσης προορισμού.
+ * Το background μπορεί να κινείται προς μια κατεύθηνση που ορίζουμε, με την βοήθεια της 
+ * μεθόδου setVector και των μεταβλητών dx και dy. Αν dx=0 και dy=0, τότε το background μένει ακίνητο.
  */
 
 public class Background {
@@ -28,6 +29,7 @@ public class Background {
 	
 	private double moveScale;
 	
+	//constructor
 	public Background(String directory, double moveScale){
 		
 		try{
@@ -44,6 +46,7 @@ public class Background {
 		
 	}
 	
+	//sets the position of the image on screen
 	public void setPosition(double x, double y){
 		
 		this.x = x*moveScale;
@@ -52,6 +55,7 @@ public class Background {
 		
 	}
 	
+	//sets the direction that the image moves
 	public void setVector(double dx, double dy){
 		
 		this.dx = dx;
@@ -59,6 +63,7 @@ public class Background {
 		
 	}
 
+	//fixes the position of the image (to avoid some rendering errors)
 	private void fixPosition() {
 		while(x <= -width) x+=width;
 		while(x >= width) x -= width;
@@ -66,6 +71,7 @@ public class Background {
 		while(y >= height) y -= height;
 	}
 	
+	//update new position
 	public void update(){
 		
 		x += dx;
@@ -74,8 +80,9 @@ public class Background {
 		
 	}
 	
+	//draw image to the panel
 	public void render(Graphics2D g){
-		
+	
 		g.drawImage(image,(int)x,(int)y,width,height,null);
 		if(x < 0){
 			g.drawImage(image, (int)x + GamePanel.WIDTH,(int)y,width,height,null);

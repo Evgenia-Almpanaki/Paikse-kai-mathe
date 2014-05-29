@@ -59,20 +59,23 @@ public class MenuState extends GameState {
 		
 		//draw menu options
 		g.setFont(menuOptionsFont);
+		FontMetrics fm;
 		for(int i = 0; i<options.length();i++){
+			
 			if(i == currentMenuChoise){
 				g.setColor(Color.BLACK);
 			}
 			else{
 				g.setColor(menuOptionsColor);
 			}
-			FontMetrics fm = g.getFontMetrics();
 			
+			fm = g.getFontMetrics();
 			g.drawString(options.getOption(i), GamePanel.WIDTH/2 - fm.stringWidth(options.getOption(i))/2, GamePanel.HEIGHT /3 +  i*GamePanel.HEIGHT/6 + fm.getMaxAscent() + fm.getLeading());
 			options.setHeight(fm.getHeight(), i);
 			options.setWidth(fm.stringWidth(options.getOption(i)), i);
 			options.setX(GamePanel.WIDTH/2 - options.getWidth(i)/2, i);
 			options.setY(GamePanel.HEIGHT /3 +  i*GamePanel.HEIGHT/6, i);
+			
 		}
 		
 	}
@@ -99,6 +102,7 @@ public class MenuState extends GameState {
 			gsm.setState(GameStateManager.INPUT_STATE);
 		}
 		else if(currentMenuChoise == 1){
+			ScoreDisplayState.setPreviousState(GameStateManager.MENU_STATE);
 			gsm.setState(GameStateManager.SCORE_DISPLAY_STATE);
 		}
 		else if(currentMenuChoise == 2){

@@ -2,11 +2,19 @@ package GameState;
 
 import java.awt.Graphics2D;
 
+/*
+ * Αυτή η κλάση υποδηλώνει μια <<φάση>> ή μια κατάσταση του παιχνιδιού. Κατάσταση, για παράδειγμα,
+ * μπορεί να είναι η εισαγωγή ονόματος του παίχτη ή ένα παιχνίδι μαθήματος ή το τέλος του 
+ * παιχνιδιού (game over). Είναι abstract γιατί υπάρχουν πολλές φάσεις με κοινές ιδιότητες.
+ */
+
 public abstract class GameState {
 
+	//fields
 	protected GameStateManager gsm;
 	protected boolean hasBeenInitiated = false;
 	
+	////methods
 	public boolean hasBeenInitiated(){
 		return hasBeenInitiated;
 	}
