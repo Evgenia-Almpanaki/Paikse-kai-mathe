@@ -17,7 +17,7 @@ public class GameMathState extends GameState {
 
 	public GameMathState(GameStateManager gsm){
 		this.gsm = gsm;
-
+/*
 		//init background
 		bg=new Background("/math.jpg",1);
 		bg.setVector(0, 0);
@@ -28,7 +28,7 @@ public class GameMathState extends GameState {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+*/
 	}
 
 	@Override
@@ -45,11 +45,11 @@ public class GameMathState extends GameState {
 
 	@Override
 	public void render(Graphics2D g) {
-
+/*
 		bg.render(g);
 		g.drawImage(image, GamePanel.WIDTH/4, GamePanel.HEIGHT/4,GamePanel.WIDTH/2, GamePanel.HEIGHT/3,null);
 		
-
+*/
 	}
 
 	@Override

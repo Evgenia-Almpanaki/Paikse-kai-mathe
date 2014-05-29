@@ -3,12 +3,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 
 import Entity.QuestionManager_Geography;
-import Entity.Question_Geography;
-import Main.GamePanel;
 
 
 public class GameGeographyState extends GameState{
@@ -19,9 +15,6 @@ public class GameGeographyState extends GameState{
 	private String imagePath, backgroundPath;
 	private int difficulty=0;
 	private GameGeographySubState game;
-	private String questions;
-	private int width = GamePanel.WIDTH;
-	private int height = GamePanel.HEIGHT;
 
 	public GameGeographyState(GameStateManager gsm){
 		this.gsm = gsm;
@@ -29,41 +22,11 @@ public class GameGeographyState extends GameState{
 		imagePath="/1/greece.jpg";
 
 		questionManager=loadQuestions("Data/"+questionsFile);
-		save();
-
+		
 		game=new GameGeographySubState(backgroundPath, imagePath , questionManager,gsm);
 	}
 
-	private void save() {
-		try {
-			FileWriter fr=new FileWriter("questions_Geography1.txt");
-			PrintWriter pr=new PrintWriter(fr);
-			
-			pr.println("Questions - Greece");
-			for(Question_Geography q: questionManager.getQuestionsGreece()){
-				pr.println(q.getQuestion());
-				pr.println(   (   (q.getPoint().x ) *1000)/width          ) ;
-				pr.println(   (   (q.getPoint().y ) *1000)/height         );
-			}
-			
-			pr.println("Questions - Europe");
-			for(Question_Geography q: questionManager.getQuestionsEurope()){
-				pr.println(q.getQuestion());
-				pr.println(   (   (q.getPoint().x ) *1000)/width          ) ;
-				pr.println(   (   (q.getPoint().y ) *1000)/height         );
-			
-			}
-			
-			pr.close();
-			fr.close();
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
+	
 	public QuestionManager_Geography loadQuestions(String file){
 		questionManager= new QuestionManager_Geography();
 		try{
@@ -97,6 +60,7 @@ public class GameGeographyState extends GameState{
 
 			in.close();
 			fr.close();
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();

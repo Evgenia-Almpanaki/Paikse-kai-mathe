@@ -9,12 +9,25 @@ public class Question_Geography implements Serializable{
 	
 	private String question;
 	private Point pos; 
-	private boolean selected=false;
+	private boolean selected;
+	private boolean asked;
 	
 	public Question_Geography(String q,Point p){
 		question=q;
 		pos=p;
+		selected=false;
+		asked=false;
 	}
+	
+	public boolean isAsked() {
+		return asked;
+	}
+
+	public void setAsked(boolean asked) {
+		this.asked = asked;
+	}
+
+	
 	
 	public String getQuestion(){
 		return question;

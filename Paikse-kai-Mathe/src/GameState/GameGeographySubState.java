@@ -4,6 +4,7 @@ package GameState;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,6 +22,7 @@ import Background.Background;
 import Entity.GameButton;
 import Entity.MessageBox;
 import Entity.Player;
+import Entity.Question;
 import Entity.QuestionManager_Geography;
 import Entity.Question_Geography;
 import Main.GamePanel;
@@ -40,6 +42,8 @@ public class GameGeographySubState {
 	private GameStateManager gsm;
 	private int difficulty;
 	private boolean once=false;
+	private int width = GamePanel.WIDTH;
+	private int height = GamePanel.HEIGHT;
 
 	public GameGeographySubState(String backgroundPath,String imagePath, QuestionManager_Geography qm,  GameStateManager gsm) {
 
@@ -130,12 +134,18 @@ public class GameGeographySubState {
 		} 
 		else{
 			String selectedQuestion = null;
+			
 
 			if(difficulty==1){
 
 				for(Question_Geography q:questionManager.getQuestionsGreece()){
-					if(x>q.getPoint().x && y>q.getPoint().y &&
-							x<(q.getPoint().x+10) && y<q.getPoint().y+10){
+
+					int minx=(int)(q.getPoint().x *(width/1000.0));
+					int miny=(int)(q.getPoint().y *(height/1000.0));
+					int maxx=10+(int)(q.getPoint().x *(width/1000.0));
+					int maxy=10+(int)(q.getPoint().y *(height/1000.0));
+					
+					if(x>minx && y>miny && x<maxx && y<maxy){
 						selectedQuestion=q.getQuestion();
 					}
 				}
@@ -148,13 +158,18 @@ public class GameGeographySubState {
 			}
 			else if(difficulty==2){
 
-				for(Question_Geography q:questionManager.getQuestionsGreece()){
-					if(x>q.getPoint().x && y>q.getPoint().y &&
-							x<(q.getPoint().x+10) && y<q.getPoint().y+10){
+				for(Question_Geography q:questionManager.getQuestionsEurope()){
+
+					int minx=(int)(q.getPoint().x *(width/1000.0));
+					int miny=(int)(q.getPoint().y *(height/1000.0));
+					int maxx=10+(int)(q.getPoint().x *(width/1000.0));
+					int maxy=10+(int)(q.getPoint().y *(height/1000.0));
+					
+					if(x>minx && y>miny && x<maxx && y<maxy){
 						selectedQuestion=q.getQuestion();
 					}
 				}
-				for(Question_Geography q:questionManager.getQuestionsGreece()){
+				for(Question_Geography q:questionManager.getQuestionsEurope()){
 					if(q.getQuestion().equals(selectedQuestion)) 
 						q.setSelected(true); 
 					else 
@@ -204,7 +219,6 @@ public class GameGeographySubState {
 			// draw question
 			g.drawString(currentQuestion.getQuestion(), GamePanel.WIDTH/3, GamePanel.HEIGHT/8);
 
-
 			// draw answers
 			if(difficulty==1){
 				for(Question_Geography q:questionManager.getQuestionsGreece()){ 
@@ -212,7 +226,7 @@ public class GameGeographySubState {
 						g.setColor(Color.GREEN); 
 					else 
 						g.setColor(Color.red);
-					g.fillOval(q.getPoint().x, q.getPoint().y, 10, 10);
+					g.fillOval((int)(q.getPoint().x*(width/1000.0)),(int) (q.getPoint().y*(height/1000.0)), 10, 10);
 				}
 			}
 			else if(difficulty==2){
@@ -221,25 +235,25 @@ public class GameGeographySubState {
 						g.setColor(Color.GREEN); 
 					else 
 						g.setColor(Color.red);
-					g.fillOval(q.getPoint().x, q.getPoint().y, 10, 10);
+					g.fillOval((int)(q.getPoint().x*(width/1000.0)),(int) (q.getPoint().y*(height/1000.0)), 10, 10);
 				}
 			}
 		}
 	}
 	public void init() {
-		
+
 		difficulty=gsm.getDifficulty();
 		player = gsm.getPlayer();
-		
+
 		if(once && difficulty==1){
-				if(questionManager.getQuestionsGreece().size()>0)
-					currentQuestion = questionManager.getQuestionsGreece().get(0);
+			if(questionManager.getQuestionsGreece().size()>0)
+				currentQuestion = questionManager.getNextQuestionGreece(new Question_Geography("", new Point(0,0)));
 		}
 		else if(once && difficulty==2){
 			if(questionManager.getQuestionsEurope().size()>0)
-				currentQuestion = questionManager.getQuestionsEurope().get(0);	
+				currentQuestion = questionManager.getNextQuestionEurope(new Question_Geography("", new Point(0,0)));
 		}
-		
+
 	}
 
 	public void update() {
