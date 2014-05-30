@@ -11,8 +11,9 @@ public class QuestionManager_Geography implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private static int numberOfAskedQuestions=0;
+	private static final int maxNumberOfAskedQuestions=10;
 	private static final String questionsFile="questions_Geography.txt";
-	
+
 	private ArrayList<Question_Geography> questionsGreece;
 	private ArrayList<Question_Geography> questionsEurope;
 	private ArrayList<Question_Geography> askedQuestions;
@@ -21,15 +22,16 @@ public class QuestionManager_Geography implements Serializable{
 	public QuestionManager_Geography(){
 
 		init();
+		loadQuestions();
 	}
-	
+
 	public void init() {
 
 		questionsGreece = new ArrayList<Question_Geography>();
 		questionsEurope = new ArrayList<Question_Geography>();
 		askedQuestions = new ArrayList<Question_Geography>();
 		oncePlayed=false;
-		
+
 	}
 
 	public void addQuestionGreece(String q,Point p){
@@ -80,7 +82,7 @@ public class QuestionManager_Geography implements Serializable{
 
 			in.close();
 			fr.close();
-			
+
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -90,10 +92,9 @@ public class QuestionManager_Geography implements Serializable{
 
 	public Question_Geography getNextQuestionGreece(Question_Geography q){
 		if(!oncePlayed){
-			numberOfAskedQuestions++;
-			if(numberOfAskedQuestions>10){
-				oncePlayed=false;
-				return null;}
+			if(numberOfAskedQuestions>maxNumberOfAskedQuestions){
+				oncePlayed=true;
+			}
 			else{
 
 				for(Question_Geography ques: questionsGreece){
@@ -115,15 +116,25 @@ public class QuestionManager_Geography implements Serializable{
 				return getQuestionsGreece().get(number);
 			}
 		}
-		else{
+		if(oncePlayed){
+			int i;
+			for(i=0; i<askedQuestions.size();i++){
+				Question_Geography ques= askedQuestions.get(i);
+				if(ques.getQuestion().equals(q.getQuestion())){
+					break;
+				}
 
-			for(Question_Geography ques: askedQuestions){
-				if(ques.isAnswered()){
+			}
+			i++;
+			if(i==askedQuestions.size()) i=0;
+			for(int j=i; j<askedQuestions.size();j++){
+				Question_Geography ques= askedQuestions.get(j);
+				if(!ques.isAnswered()){
 					return ques;
 				}
 			}
-			return null;
 		}
+		return null;
 	}
 
 	public Question_Geography getNextQuestionEurope(Question_Geography q){
@@ -139,7 +150,7 @@ public class QuestionManager_Geography implements Serializable{
 
 	}
 
-	
+
 
 
 }

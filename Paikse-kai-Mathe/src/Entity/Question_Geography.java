@@ -18,6 +18,7 @@ public class Question_Geography implements Serializable{
 		pos=p;
 		selected=false;
 		asked=false;
+		answered=false;
 	}
 	
 	public boolean isAnswered() {
