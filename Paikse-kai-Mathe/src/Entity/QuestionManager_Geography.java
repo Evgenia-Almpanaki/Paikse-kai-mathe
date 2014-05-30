@@ -11,7 +11,7 @@ public class QuestionManager_Geography implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private static int numberOfAskedQuestions=0;
-	private static final int maxNumberOfAskedQuestions=10;
+	private static final int maxNumberOfAskedQuestions=3;//9
 	private static final String questionsFile="questions_Geography.txt";
 
 	private ArrayList<Question_Geography> questionsGreece;
@@ -31,6 +31,7 @@ public class QuestionManager_Geography implements Serializable{
 		questionsEurope = new ArrayList<Question_Geography>();
 		askedQuestions = new ArrayList<Question_Geography>();
 		oncePlayed=false;
+		numberOfAskedQuestions=0;
 
 	}
 
@@ -92,7 +93,7 @@ public class QuestionManager_Geography implements Serializable{
 
 	public Question_Geography getNextQuestionGreece(Question_Geography q){
 		if(!oncePlayed){
-			if(numberOfAskedQuestions>maxNumberOfAskedQuestions){
+			if(numberOfAskedQuestions>=maxNumberOfAskedQuestions){
 				oncePlayed=true;
 			}
 			else{

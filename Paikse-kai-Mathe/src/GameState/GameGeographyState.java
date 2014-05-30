@@ -33,8 +33,10 @@ public class GameGeographyState extends GameState{
 	private GameStateManager gsm;
 	private int width = GamePanel.WIDTH;
 	private int height = GamePanel.HEIGHT;
+	private int once;
 
 	public GameGeographyState(GameStateManager gsm){
+		once=0;
 		this.gsm = gsm;
 		backgroundPath="/Backgrounds/geo.jpg";
 		imagePath="/1/greece.jpg";
@@ -244,20 +246,23 @@ public class GameGeographyState extends GameState{
 		}
 	}
 	public void init() {
-
+		once++;
 		questionManager.init();
 		questionManager.loadQuestions();
 		difficulty=gsm.getDifficulty();
 		player = gsm.getPlayer();
 
 		if(difficulty==1){
-			if(questionManager.getQuestionsGreece().size()>0)
+			if(questionManager.getQuestionsGreece().size()>0){
+				if(once==2)
+					System.out.println();
 				currentQuestion = questionManager.getNextQuestionGreece(new Question_Geography("", new Point(0,0)));
-		}
+			}}
 		else if(difficulty==2){
 			if(questionManager.getQuestionsEurope().size()>0)
 				currentQuestion = questionManager.getNextQuestionEurope(new Question_Geography("", new Point(0,0)));
 		}
+
 	}
 
 
