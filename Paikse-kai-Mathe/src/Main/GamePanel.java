@@ -102,8 +102,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		running = true;
 		
 		gameStateManager = new GameStateManager();
-		gameStateManager.setState(GameStateManager.MENU_STATE);
 		/*prosorino*/gameStateManager.setThread(thread);
+		gameStateManager.setState(GameStateManager.MENU_STATE);
 		
 	}
 	

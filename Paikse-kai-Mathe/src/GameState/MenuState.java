@@ -29,13 +29,13 @@ public class MenuState extends GameState {
 	public MenuState(GameStateManager gsm){
 		this.gsm = gsm;
 		background = new Background("/Backgrounds/menubg.gif", 1);
-		background.setVector(1, 0);
+		background.setVector(1, 0 );
 		
 		currentMenuChoise =0;
-		titleColor = Color.RED.darker();
-		menuOptionsColor = Color.ORANGE;
+		titleColor = Color.BLACK;
+		menuOptionsColor = Color.RED;
 		
-		titleFont = new Font("Century Gothic",Font.PLAIN,68);
+		titleFont = new Font("Century Gothic",Font.BOLD,68);
 		menuOptionsFont = new Font("Arial",Font.PLAIN,42);
 		
 		options = new MenuOptions(new String[]{"Έναρξη","Βαθμολογίες","Έξοδος"});
@@ -55,7 +55,7 @@ public class MenuState extends GameState {
 		//draw title
 		g.setColor(titleColor);
 		g.setFont(titleFont);
-		g.drawString("Game", GamePanel.WIDTH/2 - g.getFontMetrics().stringWidth("Game")/2, 100);
+		g.drawString("Παίξε - Μάθε", GamePanel.WIDTH/2 - g.getFontMetrics().stringWidth("Παίξε - Μάθε")/2, 120);
 		
 		//draw menu options
 		g.setFont(menuOptionsFont);
@@ -97,13 +97,16 @@ public class MenuState extends GameState {
 	}
 	
 	private void select(){
+		gsm.getThread().suspend();
 		
 		if(currentMenuChoise == 0){
 			gsm.setState(GameStateManager.INPUT_STATE);
+			gsm.getThread().resume();
 		}
 		else if(currentMenuChoise == 1){
 			ScoreDisplayState.setPreviousState(GameStateManager.MENU_STATE);
 			gsm.setState(GameStateManager.SCORE_DISPLAY_STATE);
+			gsm.getThread().resume();
 		}
 		else if(currentMenuChoise == 2){
 			System.exit(0);

@@ -3,6 +3,7 @@ package GameState;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -31,6 +32,7 @@ public class GameMathState extends GameState {
 	private GameTextField textfield;
 	private String input;
 	private Font inputFont, questionFont;
+	private boolean hasGameBeenPaused;
 
 	public GameMathState(GameStateManager gsm){
 
@@ -71,16 +73,25 @@ public class GameMathState extends GameState {
 		messageBox = new MessageBox();
 		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
 		displayMessage = false;
-
+		
+		hasGameBeenPaused = false;
 	}
 
 	@Override
 	public void init() {
-		questionManager.init();
-		questionManager.loadQuestions();
+		
+		if(!hasGameBeenPaused){
+			questionManager.init();
+			questionManager.loadQuestions();
 
-		currentQuestion=questionManager.getNextQuestion(new Question_Math("",""));
-		player = gsm.getPlayer();
+			currentQuestion=questionManager.getNextQuestion(new Question_Math("",""));
+			player = gsm.getPlayer();
+		}
+		else{
+			hasGameBeenPaused = false;
+		}
+		
+		
 	}
 
 	@Override
@@ -96,23 +107,20 @@ public class GameMathState extends GameState {
 		textfield.render(g);
 
 		g.drawImage(image, GamePanel.WIDTH/4, GamePanel.HEIGHT/4,GamePanel.WIDTH/2, GamePanel.HEIGHT/2,null);
-		
-		Font f=g.getFont();
-		Color c=g.getColor();
-		g.setColor(Color.BLUE.darker());
+
+		g.setColor(Color.BLUE);
 		g.setFont(new Font("Arial", Font.BOLD, 33));
-		
+
 		g.drawString("Βαθμοί: "+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
-		
-		g.setColor(c);
-		g.setFont(f);
-		
+
 		if(currentQuestion==null && !displayMessage) 
 			gsm.setState(GameStateManager.GAME_OVER_STATE);
 
 
-		if (displayMessage)
+		if (displayMessage){
 			messageBox.render(g);
+			g.drawString("  ", textfield.getX()+19, textfield.getY() + (int) (textfield.getHeight()/2.5) + 10);
+		}
 		else {
 			checkButton.render(g);
 			ignoreButton.render(g);
@@ -125,7 +133,7 @@ public class GameMathState extends GameState {
 			else
 				g.drawString(textfield.getText().substring(textfield.getText().length()-numberOfLettersAllowed, textfield.getText().length()), textfield.getX()+19, textfield.getY() + textfield.getHeight()/2 + 10);
 			g.setFont(questionFont);
-			
+
 			if(currentQuestion!=null)
 				questionManager.drawString(g, currentQuestion.getQuestion(),(int)(GamePanel.WIDTH*(290/1000.0)),(int)(GamePanel.HEIGHT*(330/1000.0)),(int)(GamePanel.WIDTH*(430/1000.0)));
 
@@ -138,10 +146,12 @@ public class GameMathState extends GameState {
 
 			input=textfield.getText();
 			currentQuestion.setAnswered(true);
-
+			
 			displayMessage = true;
-
-			if(currentQuestion.checkAnswer(input.trim())){
+			if(input.trim().equals("")){
+				messageBox.setMessage("Απάντησε!");
+			}
+			else if(currentQuestion.checkAnswer(input.trim())){
 				messageBox.setMessage("Σωστό!");	
 				player.setTempScore(player.getTempScore()+1);
 			}
@@ -161,6 +171,13 @@ public class GameMathState extends GameState {
 
 	@Override
 	public void keyPressed(int keyCode) {
+		if(keyCode == KeyEvent.VK_ESCAPE){
+			PauseMenuState.setPreviousState(GameStateManager.GAME_MATH_STATE);
+			gsm.setState(GameStateManager.PAUSE_MENU_STATE);
+			hasGameBeenPaused = true;
+			return;
+		}
+		
 		textfield.keyPressed(keyCode);
 
 	}

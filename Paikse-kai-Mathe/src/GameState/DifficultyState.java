@@ -43,7 +43,7 @@ public class DifficultyState extends GameState {
 		this.gsm = gsm;
 		
 		bg = new Background("/Backgrounds/menubg.gif", 1);
-		bg.setVector(0, -1);
+		bg.setVector(0,0);
 		
 		options = new MenuOptions(new String[]{"Τετάρτη Δημοτικού","Πέμπτη Δημοτικού","Έκτη Δημοτικού"});
 		currentMenuChoise = 0;
@@ -102,9 +102,9 @@ public class DifficultyState extends GameState {
 		else if(currentMenuChoise == 2)
 			gsm.setDifficulty(EKTH_DHMOTIKOU);
 		
-		gsm.getThread().suspend();//
+		gsm.getThread().suspend();
 		gsm.setState(GameStateManager.PLAYING_MENU_STATE);
-		gsm.getThread().resume();//
+		gsm.getThread().resume();
 		
 	}
 

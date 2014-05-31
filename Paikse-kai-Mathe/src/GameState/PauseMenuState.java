@@ -1,6 +1,5 @@
 package GameState;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -108,6 +107,7 @@ private void select(){
 			gsm.setState(GameStateManager.SCORE_DISPLAY_STATE);
 		}
 		else if(currentMenuChoise == 3){
+			gsm.saveScoreToFile();
 			System.exit(0);
 		}
 	}

@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -12,6 +13,7 @@ import Background.Background;
 import Entity.GameButton;
 import Entity.MessageBox;
 import Entity.Player;
+import Entity.QuestionManager;
 import Entity.QuestionManager_Geography;
 import Entity.Question_Geography;
 import Main.GamePanel;
@@ -33,6 +35,7 @@ public class GameGeographyState extends GameState{
 	private GameStateManager gsm;
 	private int width = GamePanel.WIDTH;
 	private int height = GamePanel.HEIGHT;
+	private boolean hasGameBeenPaused;
 
 	public GameGeographyState(GameStateManager gsm){
 		this.gsm = gsm;
@@ -70,7 +73,7 @@ public class GameGeographyState extends GameState{
 		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
 		displayMessage = false;
 
-
+		hasGameBeenPaused = false;
 	}
 
 	@Override
@@ -95,10 +98,27 @@ public class GameGeographyState extends GameState{
 			currentQuestion.setAnswered(true);
 
 			displayMessage = true; 
-			if(currentQuestion.isSelected() ){
+
+			boolean atLeastOneQuestionSelected = false;
+			if(difficulty==1){
+				for(Question_Geography q: questionManager.getQuestionsGreece()){
+					if(q.isSelected())
+						atLeastOneQuestionSelected = true;
+				}
+			}
+			else{
+				for(Question_Geography q: questionManager.getQuestionsEurope()){
+					if(q.isSelected())
+						atLeastOneQuestionSelected = true;
+				}
+			}
+			if(currentQuestion.isSelected() && atLeastOneQuestionSelected){
 				currentQuestion.setSelected(false);
 				messageBox.setMessage("Σωστό!");	
 				player.setTempScore(player.getTempScore()+1);
+			}
+			else if(!atLeastOneQuestionSelected){
+				messageBox.setMessage("Διάλεξε!");
 			}
 			else{
 				messageBox.setMessage("Λάθος!");
@@ -234,19 +254,26 @@ public class GameGeographyState extends GameState{
 		}
 	}
 	public void init() {
-		questionManager.init();
-		questionManager.loadQuestions();
-		difficulty=gsm.getDifficulty();
-		player = gsm.getPlayer();
+		if(!hasGameBeenPaused){
+			questionManager.init();
+			questionManager.loadQuestions();
+			difficulty=gsm.getDifficulty();
+			player = gsm.getPlayer();
 
-		if(difficulty==1){
-			if(questionManager.getQuestionsGreece().size()>0)
-				currentQuestion = questionManager.getNextQuestionGreece(new Question_Geography("", new Point(0,0)));
+			if(difficulty==1){
+				if(questionManager.getQuestionsGreece().size()>0)
+					currentQuestion = questionManager.getNextQuestionGreece(new Question_Geography("", new Point(0,0)));
+			}
+			else if(difficulty==2){
+				if(questionManager.getQuestionsEurope().size()>0)
+					currentQuestion = questionManager.getNextQuestionEurope(new Question_Geography("", new Point(0,0)));
+			}
 		}
-		else if(difficulty==2){
-			if(questionManager.getQuestionsEurope().size()>0)
-				currentQuestion = questionManager.getNextQuestionEurope(new Question_Geography("", new Point(0,0)));
+		else{
+			hasGameBeenPaused = false;
 		}
+		
+		
 
 	}
 
@@ -256,7 +283,11 @@ public class GameGeographyState extends GameState{
 	}
 
 	public void keyPressed(int keyCode) {
-
+		if(keyCode == KeyEvent.VK_ESCAPE){
+			PauseMenuState.setPreviousState(GameStateManager.GAME_GEOGRAPHY_STATE);
+			gsm.setState(GameStateManager.PAUSE_MENU_STATE);
+			hasGameBeenPaused = true;
+		}
 	}
 
 	public void keyReleased(int keyCode) {

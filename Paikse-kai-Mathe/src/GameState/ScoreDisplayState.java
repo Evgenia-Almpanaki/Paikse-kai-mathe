@@ -1,27 +1,33 @@
 package GameState;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
-
-import javax.imageio.ImageIO;
 
 import Background.Background;
 import Entity.GameButton;
-import Main.Game;
 import Main.GamePanel;
 
 public class ScoreDisplayState extends GameState {
 	
 	private Background bg;
 	
+	private String filePath;
+	
 	private String title;
 	private GameButton backButton;
 	
+	private Color titleColor;
+	private Color scoresColor;
+	
 	private String [][] scores;
+	
+	private String noScoresMessage;
+	private boolean areThereNoScores;
 	
 	private static int previousState;
 	
@@ -34,8 +40,12 @@ public class ScoreDisplayState extends GameState {
 		bg = new Background("/Backgrounds/menubg.gif", 1);
 		bg.setVector(0, 0);
 		
+		titleColor = Color.BLACK;
+		scoresColor = Color.ORANGE.darker();
+		
 		title = "Οι Μεγαλύτερες Βαθμολογίες";
-		importScores();
+		
+		filePath = scoreFilePath;
 	}
 	
 	public static void setPreviousState(int state){
@@ -45,13 +55,22 @@ public class ScoreDisplayState extends GameState {
 	private void importScores() {
 		
 		try{
-			
-			InputStreamReader input = new InputStreamReader(getClass().getResourceAsStream("/scores.data"));
+			File file = new File(filePath);
+			FileInputStream inputStream = new FileInputStream(file);
+			InputStreamReader input = new InputStreamReader(inputStream);
 			BufferedReader IN = new BufferedReader(input);
 			
-			int n = Integer.parseInt(IN.readLine());
-			scores = new String[n][2];
-			for(int i=0;i<n;i++){
+			int numberOfScores = Integer.parseInt(IN.readLine());
+			if(numberOfScores == 0){
+				areThereNoScores = true;
+				return;
+			}
+			areThereNoScores = false;
+			
+			scores = new String[numberOfScores][2];
+			
+			for(int i=0;i<numberOfScores;i++){
+				
 				String[] temp = IN.readLine().split(",");
 				scores[i][0] = temp[0];
 				scores[i][1] = temp[1];
@@ -65,6 +84,7 @@ public class ScoreDisplayState extends GameState {
 
 	public void init() {
 		importScores();
+		noScoresMessage = "Δεν υπάρχουν Βαθμολογίες";
 	}
 
 	public void update() {
@@ -73,10 +93,18 @@ public class ScoreDisplayState extends GameState {
 
 	public void render(Graphics2D g) {
 		bg.render(g);
+		g.setColor(titleColor);
 		g.drawString(title, 100, 100);
-		for(int i=0;i<scores.length;i++){
-			g.drawString((i+1) + ": " + scores[i][0] + ", " + scores[i][1], 100, 200 + i*g.getFontMetrics().getHeight());
+		g.setColor(scoresColor);
+		
+		if(areThereNoScores){
+			g.drawString(noScoresMessage, 100, 200);
 		}
+		else
+			for(int i=0;i<scores.length;i++){
+				g.drawString((i+1) + ": " + scores[i][0] + ", " + scores[i][1], 100, 200 + i*g.getFontMetrics().getHeight());
+			}
+		
 		backButton.render(g);
 	}
 

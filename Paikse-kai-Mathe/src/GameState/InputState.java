@@ -1,30 +1,18 @@
 package GameState;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints.Key;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import Background.Background;
 import Entity.GameButton;
 import Entity.GameTextField;
 import Entity.Player;
-import Main.Game;
 import Main.GamePanel;
 
 public class InputState extends GameState {
 	
 	private Background bg;
-	private BufferedImage textfield;
 	private String message;
 	private GameTextField inputField;
 	private Player player;
@@ -33,13 +21,7 @@ public class InputState extends GameState {
 	public InputState(GameStateManager gsm){
 		this.gsm = gsm;
 		
-		try{
-			
-			textfield = ImageIO.read(getClass().getResourceAsStream("/Textures/textfield.png"));
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+		
 		okButton = new GameButton("/Textures/okButton.png");
 		okButton.setX(GamePanel.WIDTH - okButton.getWidth() - 15);
 		okButton.setY(GamePanel.HEIGHT - okButton.getHeight() -15);
@@ -62,6 +44,7 @@ public class InputState extends GameState {
 
 	public void render(Graphics2D g) {
 		bg.render(g);
+		g.setColor(Color.ORANGE.darker());
 		g.drawString(message, GamePanel.WIDTH/2 - g.getFontMetrics().stringWidth(message)/2, 100);
 		inputField.render(g);
 		okButton.render(g);

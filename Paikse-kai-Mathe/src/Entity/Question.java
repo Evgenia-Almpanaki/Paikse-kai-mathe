@@ -1,5 +1,6 @@
 package Entity;
 
+import java.awt.Graphics2D;
 import java.io.Serializable;
 
 import Main.GamePanel;

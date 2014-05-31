@@ -2,6 +2,7 @@ package Main;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.util.Locale;
 
 import javax.swing.JFrame;
 

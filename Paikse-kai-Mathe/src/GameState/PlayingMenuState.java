@@ -3,8 +3,9 @@ package GameState;
 import java.awt.Graphics2D;
 
 import Background.Background;
-import Entity.Player;
+import Entity.GameButton;
 import Entity.SubjectOptions;
+import Main.GamePanel;
 
 public class PlayingMenuState extends GameState {
 
@@ -12,12 +13,17 @@ public class PlayingMenuState extends GameState {
 	
 	private String title;
 	private SubjectOptions options;
+	private GameButton buttonExit;
 	
 	public PlayingMenuState(GameStateManager gsm){
 		this.gsm = gsm;
 		
 		bg = new Background("/Backgrounds/games_menu_bg.gif", 1);
 		bg.setVector(0, 0);
+		
+		buttonExit = new GameButton("/Textures/exitButton.png");
+		buttonExit.setX(10);
+		buttonExit.setY(GamePanel.HEIGHT - buttonExit.getHeight() - 10);
 		
 		title = "Διάλεξε Παιχνίδι!";
 	}
@@ -38,6 +44,7 @@ public class PlayingMenuState extends GameState {
 		//if(options == null)
 			//options = new SubjectOptions(gsm.getDifficulty());
 		options.render(g);
+		buttonExit.render(g);
 	}
 
 	public void keyPressed(int keyCode) {}
@@ -45,6 +52,10 @@ public class PlayingMenuState extends GameState {
 	public void keyReleased(int keyCode) {}
 
 	public void mouseClicked(int mouseType, int x, int y) {
+		if(buttonExit.isClicked(x, y)){
+			gsm.saveScoreToFile();
+			System.exit(0);
+		}
 		int option = options.subjectClicked(x, y);
 		gsm.getThread().suspend();//
 		if(option == 0){

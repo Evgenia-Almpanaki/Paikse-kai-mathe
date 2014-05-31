@@ -17,17 +17,17 @@ import Entity.Player;
 import Entity.QuestionManager;
 import Main.GamePanel;
 
+
+
 public class GameGrammarState extends GameState{
 	
 	private Background bg;
 	
-	private String score;
+	private int score;
 	private GameButton buttonCheck;
 	private GameButton buttonSkip;
-	private GameButton buttonExit;
+	
 	private Player player;
-	//private MessageBox messageBox;
-	//private boolean displayMessage;
 	
     private GrammarQuestionManager manager;
     
@@ -36,18 +36,12 @@ public class GameGrammarState extends GameState{
     
     private String textFile; 
     
-    private String[] rightAnswer = {"Παρακολουθείτε", "Βλέπετε", "περπατούν", "εκτελούν", "καλπάζουν", "στέκονται", "δαμάζουν",
-    		"Απολαμβάνετε", "Εμφανίζονται", "καταπίνουν", "κάθονται"};
-    
-    private Color generalColor = Color.yellow;
-	private Font generalFont = new Font("Century Gothic", Font.PLAIN, 23); // 23 kanoniko
+    private String[] rightAnswer;
 	
 	private Color titleColor = Color.yellow;
 	private Font titleFont = new Font("Century Gothic", Font.BOLD, 34);
 	
 	private Color JTextFieldColor = Color.black;
-	private Color JTextFieldColorRightAnswer = Color.green;
-	private Color JTextFieldColorWrongAnswer = Color.red;
 	private Font JTextFieldFont = new Font("Century Gothic", Font.BOLD, 23);
 	
 	
@@ -70,22 +64,18 @@ public class GameGrammarState extends GameState{
 	
 	private int thesh;
 	
+	private boolean tonos = false;
+	private boolean capsLockIsON = false;
+
 	private boolean hasGameBeenPaused;
-	
-	boolean tonos = false;
-	boolean capsLockIsON = false;
     
     public GameGrammarState(GameStateManager gsm) {
     	
-    	//inputList.add("");
-    	
     	this.gsm = gsm;
-        //ImageIcon image = new ImageIcon(this.getClass().getResource(s));
+        
         
         bg = new Background("/Backgrounds/board.jpg", 1);
 		bg.setVector(0, 0); // kinhsh
-		
-		hasGameBeenPaused = false;
 		
 		try {
 			
@@ -106,12 +96,8 @@ public class GameGrammarState extends GameState{
 		buttonCheck.setX(GamePanel.WIDTH - buttonCheck.getWidth() - 10);
 		buttonCheck.setY(buttonSkip.getY() - buttonCheck.getHeight() - 10);
 		
-		buttonExit = new GameButton("/Textures/exitButton.png");
-		buttonExit.setX(10);
-		buttonExit.setY(GamePanel.HEIGHT - buttonExit.getHeight() - 10);  
-        
-        //TextFieldImage = new GameButton("/Backgrounds/GrammarTextField2.png");
 		
+		hasGameBeenPaused = false;
 		
     }
     
@@ -120,12 +106,15 @@ public class GameGrammarState extends GameState{
 		if(!hasGameBeenPaused){
 			manager = new GrammarQuestionManager("grammar", gsm.getDifficulty());
 			player = gsm.getPlayer();
-			score = "Σκόρ: " + player.getTempScore();
+			score = player.getTempScore();
 			textFile =  manager.getCurrentQuestion();
 			rightAnswer = manager.getAnswerList();
 		}
-		else
+		else{
 			hasGameBeenPaused = false;
+		}
+		
+		
 	}
 
 	@Override
@@ -136,15 +125,16 @@ public class GameGrammarState extends GameState{
         bg.render(g); 
         buttonCheck.render(g);
         buttonSkip.render(g);
-        buttonExit.render(g);
-        //System.out.println(manager);
-        /*if(manager == null){
-        	System.out.println("s");
+       
+        
+        if(manager == null){
+        	//System.out.println("s");
         	manager = new GrammarQuestionManager("grammar", gsm.getDifficulty());
-        }*/
-        	
-        score = manager.getScore();
-        g.drawString(score, 1200, 60);
+        }
+        
+        String tempScore = "Σκόρ: " + score;
+        
+        g.drawString(tempScore, 1200, 60);
         
         g.setColor(titleColor);
 		g.setFont(titleFont);
@@ -163,6 +153,8 @@ public class GameGrammarState extends GameState{
     public void drawString(Graphics2D g, String s, int x, int y, int width)
     {
 		
+    	
+    	
     	if(input != null && this.isPressed ){
     		
     		g.setColor(JTextFieldColor);
@@ -172,23 +164,41 @@ public class GameGrammarState extends GameState{
  	        
     		if(input.length() == 0){
         		g.drawString(input, this.curX.get(thesh), this.curY.get(thesh)+25);
-        		//System.out.println("1");
+        		
         	}
+    		else if(g.getFontMetrics().stringWidth(input) > 150){
+    			//System.out.println("in");
+    			String tempInput = "";
+    			
+    			int counter =1;
+    			tempInput = input;
+    			while(true){
+    				if(g.getFontMetrics().stringWidth(tempInput) > 180){
+    					tempInput = input.substring(counter);
+    					counter++;
+    				}
+    				else{
+    					break;
+    				}
+    					
+    			}
+    			g.drawImage(TextFieldImage, this.curX.get(thesh), this.curY.get(thesh), 190, this.height, null);
+        		g.drawString(tempInput, this.curX.get(thesh)+8, this.curY.get(thesh)+25);
+    		}
     		else {
         		g.drawImage(TextFieldImage, this.curX.get(thesh), this.curY.get(thesh), 190, this.height, null);
         		g.drawString(input, this.curX.get(thesh)+8, this.curY.get(thesh)+25);
         		
         		//manager.setinput(input);
         		//manager.setOriginalWord("*Παρακολουθείτε*");
-        		
-        		//System.out.println("3");
         	}
+    		
     	}
-    	else if(input!= null &&this.isPressed){
+    	/*else if(input!= null &&this.isPressed){
     		/*for(int i=0; i<inputList.size(); i++){
     			//g.drawString(inputList.get(i), this.curX.get(i), this.curY.get(i)+25);
     		}*/
-    	}
+    	//}
     	
     	
         
@@ -208,7 +218,6 @@ public class GameGrammarState extends GameState{
 			
 			if(x >= this.curX.get(i) && x<=this.curX.get(i) + this.width.get(i)  && y>= this.curY.get(i) && y<= this.curY.get(i) + this.height){
 				
-				//System.out.println("Check");
 				thesh = i;
 				isPressed = true;
 				this.originalWord = wordList.get(thesh);
@@ -222,16 +231,6 @@ public class GameGrammarState extends GameState{
 
 	@Override
 	public void mouseClicked(int mouseType, int x, int y) {
-		
-		
-		
-		/*for(int i=0; i<inputList.size(); i++){
-			//System.out.println(this.inputList.get(i));
-			
-		}*/
-		
-		
-		//System.out.println("....");
 		
 		//Textfield pressed :)
 		if(textFieldImageIsClicked(x, y)){
@@ -251,20 +250,18 @@ public class GameGrammarState extends GameState{
 		if(buttonCheck.isClicked(x, y)){
 			manager.setCheck(true);
 			manager.checkQuestion();
+			score += manager.getScore();
 			//manager.removeQuestion(textFile);
 			//manager.getNextQuestion();
 			//this.isPressed = true;
 			
-			System.out.println("Check1");
+			//System.out.println("Check1");
 		}
 		else if(buttonSkip.isClicked(x, y)){
 			manager.getNextQuestion();
-			System.out.println("Check2");
+			//System.out.println("Check2");
 		}
-		else if(buttonExit.isClicked(x, y)){
-			
-			System.exit(0);
-		}
+		
 		
 		
 	}

@@ -32,12 +32,11 @@ public class GameHistoryState extends GameState {
 	private String score;
 	private GameButton buttonCheck;
 	private GameButton buttonSkip;
-	private GameButton buttonExit;
 	private Player player;
 	private MessageBox messageBox;
 	
 	private boolean hasGameBeenPaused;
-	private boolean displayMessage;
+	private boolean displayCheckMessage;
 	
 	private Color scoreColor;
 	
@@ -56,16 +55,12 @@ public class GameHistoryState extends GameState {
 		buttonCheck.setX(GamePanel.WIDTH - buttonCheck.getWidth() - 10);
 		buttonCheck.setY(buttonSkip.getY() - buttonCheck.getHeight() - 10);
 		
-		buttonExit = new GameButton("/Textures/exitButton.png");
-		buttonExit.setX(10);
-		buttonExit.setY(GamePanel.HEIGHT - buttonExit.getHeight() - 10);
-		
 		bg = new Background("/Backgrounds/history_bg.gif", 1);
 		bg.setVector(0, 0);
 		
 		messageBox = new MessageBox();
 		messageBox.setXandY(GamePanel.WIDTH/2 - messageBox.getWidth()/2, GamePanel.HEIGHT/2 - messageBox.getHeight()/2);
-		displayMessage = false;
+		displayCheckMessage = false;
 		
 		hasGameBeenPaused = false;
 		
@@ -88,7 +83,7 @@ public class GameHistoryState extends GameState {
 		bg.render(g);
 		g.setColor(scoreColor);
 		g.drawString(score, 500, 100);
-		if(displayMessage)
+		if(displayCheckMessage)
 			messageBox.render(g);
 		else{
 			manager.render(g);
@@ -96,85 +91,9 @@ public class GameHistoryState extends GameState {
 			if(manager.size() != 0){
 				buttonCheck.render(g);
 				buttonSkip.render(g);
-				buttonExit.render(g);
 			}
 		}
 			
-	}
-	
-	private void saveScoreToFile(){
-		
-		try{
-			//read score file to update it
-			InputStreamReader input = new InputStreamReader(getClass().getResourceAsStream("/scores.data"));
-			BufferedReader IN = new BufferedReader(input);
-		
-			int freeScoreSlots = Integer.parseInt(IN.readLine());
-			
-			if(freeScoreSlots == 0){
-				
-				try{
-					freeScoreSlots++;
-					
-					File file = new File("Save/scores.data");
-					FileOutputStream output = new FileOutputStream(file);
-					PrintStream OUT = new PrintStream(output);
-					
-					OUT.println(String.valueOf(freeScoreSlots));
-					OUT.println(player.getName() + "," +player.getTotalScore());
-					
-					OUT.close();
-					output.close();
-					
-				}catch(Exception ex){
-					ex.printStackTrace();
-				}
-				
-			}
-			else if(freeScoreSlots < 5){
-				freeScoreSlots++;
-				
-				ArrayList<String> list= new ArrayList<String>();
-				for(int i=0;i<freeScoreSlots-1;i++){
-					list.add(IN.readLine());
-				}
-				list.add(player.getName() + "," + player.getTotalScore());
-				
-				Comparator<String> comparator = new Comparator<String>() {
-				    public int compare(String c1, String c2) {
-				        String[] temp1 = c1.split(",");
-				        String[] temp2 = c2.split(",");
-				        return -(Integer.parseInt(temp1[1]) - Integer.parseInt(temp2[1]));
-				    }
-				};
-				
-				Collections.sort(list, comparator);
-				
-				try{
-					
-					File file = new File("Save/scores.data");
-					FileOutputStream output = new FileOutputStream(file);
-					PrintStream OUT = new PrintStream(output);
-					
-					OUT.println(String.valueOf(freeScoreSlots));
-					for(int i=0;i<list.size();i++){
-						OUT.println(list.get(i));
-					}
-					
-					OUT.close();
-					output.close();
-					
-				}catch(Exception ex){
-					ex.printStackTrace();
-				}
-				
-			}
-			
-		
-		}catch(Exception ex){
-			ex.printStackTrace();
-		}
-		
 	}
 
 	public void keyPressed(int keyCode) {
@@ -188,17 +107,22 @@ public class GameHistoryState extends GameState {
 	public void keyReleased(int keyCode) {}
 
 	public void mouseClicked(int mouseType, int x, int y) {
-		if(displayMessage){
+		if(displayCheckMessage){
 			if(messageBox.isOkButtonClicked(x, y))
-				displayMessage = false;
+				displayCheckMessage = false;
 		}
 		else{
 			manager.mouseClicked(x, y);
 		
 			if(buttonCheck.isClicked(x, y)){
 			
-				displayMessage = true;
+				displayCheckMessage = true;
 				messageBox.setMessage("Λάθος");
+				if(manager.getCurrentAnswer() == -1){
+					displayCheckMessage = true;
+					messageBox.setMessage("Επέλεξε κάτι");
+					return;
+				}
 				if(manager.getCurrentQuestionCorrectIndex() == manager.getCurrentAnswer()){
 					player.setTempScore(player.getTempScore()+1);
 					score = "Σκόρ: " + player.getTempScore();
@@ -214,18 +138,11 @@ public class GameHistoryState extends GameState {
 			else if(buttonSkip.isClicked(x, y)){
 				manager.getNextQuestion();
 			}
-			else if(buttonExit.isClicked(x, y)){
-				player.setTotalScore(player.getTempScore() + player.getTotalScore());
-				player.setTempScore(0);
-				saveScoreToFile();
-				System.exit(0);//allagh
-			}
 		}
 		
 		if(manager.size()==0 && manager.skippedListSize()==0){
-			if(displayMessage)
+			if(displayCheckMessage)
 				return;
-			saveScoreToFile();
 			gsm.setState(GameStateManager.GAME_OVER_STATE);
 		}
 	}
