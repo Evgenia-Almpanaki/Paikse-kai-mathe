@@ -186,22 +186,12 @@ public class GameGeographyState extends GameState{
 	}
 	public void render(Graphics2D g) {
 
-		boolean done = false;
-
 		background.render(g);
 		g.drawImage(image, xImage, yImage,GamePanel.WIDTH/2,3 * (GamePanel.HEIGHT/4),null);
 
-		if(currentQuestion==null && !displayMessage) {
-			g.drawString("Δεν υπάρχουν άλλες ερωτήσεις",GamePanel.WIDTH/3, GamePanel.HEIGHT/8 );
-			done=true;
-		}
-
-		if(done){
-			done=false;
-			displayMessage=false;
+		if(currentQuestion==null && !displayMessage)
 			gsm.setState(GameStateManager.GAME_OVER_STATE);
 
-		}
 		g.setColor(Color.MAGENTA);
 		g.drawString("Βαθμοί: "+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
 

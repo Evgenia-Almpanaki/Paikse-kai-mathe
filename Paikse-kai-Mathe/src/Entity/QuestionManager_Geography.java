@@ -51,7 +51,6 @@ public class QuestionManager_Geography implements Serializable{
 	}
 
 	public QuestionManager_Geography loadQuestions(){
-		init();
 		try{
 			FileReader fr=new FileReader("Data/"+questionsFile);
 			BufferedReader in = new BufferedReader(fr);
@@ -129,6 +128,12 @@ public class QuestionManager_Geography implements Serializable{
 			i++;
 			if(i==askedQuestions.size()) i=0;
 			for(int j=i; j<askedQuestions.size();j++){
+				Question_Geography ques= askedQuestions.get(j);
+				if(!ques.isAnswered()){
+					return ques;
+				}
+			}
+			for(int j=0; j<i;j++){
 				Question_Geography ques= askedQuestions.get(j);
 				if(!ques.isAnswered()){
 					return ques;

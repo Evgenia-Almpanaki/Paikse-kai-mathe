@@ -14,7 +14,6 @@ import Entity.GameTextField;
 import Entity.MessageBox;
 import Entity.Player;
 import Entity.QuestionManager_Math;
-import Entity.Question_Geography;
 import Entity.Question_Math;
 import Main.GamePanel;
 
@@ -37,10 +36,9 @@ public class GameMathState extends GameState {
 
 		this.gsm = gsm;
 		questionManager=new QuestionManager_Math();
-		currentQuestion=questionManager.getQuestion(0);
 
 		//fonts
-		inputFont=new Font("Arial", Font.ITALIC , 33);
+		inputFont=new Font(Font.MONOSPACED, Font.ITALIC , 33);
 		questionFont=questionManager.getQuestionFont();
 
 		//init background
@@ -80,12 +78,14 @@ public class GameMathState extends GameState {
 	public void init() {
 		questionManager.init();
 		questionManager.loadQuestions();
+
+		currentQuestion=questionManager.getNextQuestion(new Question_Math("",""));
 		player = gsm.getPlayer();
 	}
 
 	@Override
 	public void update() {
-		//////////////////////
+
 	}
 
 	@Override
@@ -96,7 +96,20 @@ public class GameMathState extends GameState {
 		textfield.render(g);
 
 		g.drawImage(image, GamePanel.WIDTH/4, GamePanel.HEIGHT/4,GamePanel.WIDTH/2, GamePanel.HEIGHT/2,null);
-		questionManager.drawString(g, currentQuestion.getQuestion(),(int)(GamePanel.WIDTH*(290/1000.0)),(int)(GamePanel.HEIGHT*(330/1000.0)),(int)(GamePanel.WIDTH*(430/1000.0)));
+		
+		Font f=g.getFont();
+		Color c=g.getColor();
+		g.setColor(Color.BLUE.darker());
+		g.setFont(new Font("Arial", Font.BOLD, 33));
+		
+		g.drawString("Βαθμοί: "+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
+		
+		g.setColor(c);
+		g.setFont(f);
+		
+		if(currentQuestion==null && !displayMessage) 
+			gsm.setState(GameStateManager.GAME_OVER_STATE);
+
 
 		if (displayMessage)
 			messageBox.render(g);
@@ -108,10 +121,14 @@ public class GameMathState extends GameState {
 			int numberOfLettersAllowed=(int) (textfield.getWidth() * 0.8 )/g.getFontMetrics().getWidths()[0];
 
 			if(textfield.getText().length()<numberOfLettersAllowed)
-				g.drawString(textfield.getText(), textfield.getX()+19, textfield.getY() + textfield.getHeight()/2 + 10);
+				g.drawString(textfield.getText(), textfield.getX()+19, textfield.getY() + (int) (textfield.getHeight()/2.5) + 10);
 			else
 				g.drawString(textfield.getText().substring(textfield.getText().length()-numberOfLettersAllowed, textfield.getText().length()), textfield.getX()+19, textfield.getY() + textfield.getHeight()/2 + 10);
 			g.setFont(questionFont);
+			
+			if(currentQuestion!=null)
+				questionManager.drawString(g, currentQuestion.getQuestion(),(int)(GamePanel.WIDTH*(290/1000.0)),(int)(GamePanel.HEIGHT*(330/1000.0)),(int)(GamePanel.WIDTH*(430/1000.0)));
+
 		}
 	}
 
@@ -126,15 +143,15 @@ public class GameMathState extends GameState {
 
 			if(currentQuestion.checkAnswer(input.trim())){
 				messageBox.setMessage("Σωστό!");	
-				//player.setTempScore(player.getTempScore()+1);
+				player.setTempScore(player.getTempScore()+1);
 			}
 			else{
 				messageBox.setMessage("Λάθος!");
 			}
-			currentQuestion=questionManager.getNextQuestion();
+			currentQuestion=questionManager.getNextQuestion(currentQuestion);
 		}
 		else if(ignoreButton.isClicked(x, y) && !displayMessage){ 
-			currentQuestion=questionManager.getNextQuestion();
+			currentQuestion=questionManager.getNextQuestion(currentQuestion);
 		} 
 		else if(displayMessage && messageBox.isOkButtonClicked(x, y)){ 
 			displayMessage= false; 

@@ -5,13 +5,22 @@ public class Question_Math {
 	private String question;
 	private String answer; 
 	private boolean answered;
-	
+	private boolean asked;
 	public Question_Math(String q,String ans){
 		question=q;
 		answer=ans;
 		answered=false;
+		asked=false;
 	}
 	
+	public boolean isAsked() {
+		return asked;
+	}
+
+	public void setAsked(boolean asked) {
+		this.asked = asked;
+	}
+
 	public boolean isAnswered() {
 		return answered;
 	}

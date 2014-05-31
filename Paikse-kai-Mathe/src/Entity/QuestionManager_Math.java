@@ -14,17 +14,18 @@ public class QuestionManager_Math {
 	private static final String questionsFile="questions_Math.txt";
 
 	private ArrayList<Question_Math> questions;
+	private ArrayList<Question_Math> askedQuestions;
 	private boolean oncePlayed;
 
 	private Font questionFont;
 
 	public QuestionManager_Math(){
 
-		//fonts
+		//font
 		questionFont = new Font("Century Gothic", Font.ITALIC, 23);
+		
 		init();
 		loadQuestions();
-
 	}
 
 	public Font getQuestionFont() {
@@ -40,6 +41,7 @@ public class QuestionManager_Math {
 	public void init() {
 
 		questions = new ArrayList<Question_Math>();
+		askedQuestions= new ArrayList<Question_Math>();
 		oncePlayed=false;
 
 	}
@@ -74,25 +76,58 @@ public class QuestionManager_Math {
 		return this;
 	}
 
-	public Question_Math getNextQuestion(){
+	public Question_Math getNextQuestion(Question_Math q){
+		
+		if(!oncePlayed){
+			int index, numberOfAskedQuestions=0;
 
-		int index, numberOfAnsweredQuestions=0;
+			for(Question_Math ques: questions){
+				if(ques.isAsked())
+					numberOfAskedQuestions++;
+			}
+			if(numberOfAskedQuestions == questions.size())
+				oncePlayed=true;
+			else{
+				do{
+					Random generator = new Random(System.currentTimeMillis());
+					index=generator.nextInt(questions.size());
+				}while(questions.get(index).isAsked());
 
-		for(Question_Math q: questions){
-			if(q.isAnswered())
-				numberOfAnsweredQuestions++;
+				questions.get(index).setAsked(true);
+				askedQuestions.add(questions.get(index));
+				
+				return questions.get(index);
+			}
 		}
-		if(numberOfAnsweredQuestions == questions.size())
-			return null;
-		else{
-			do{
-				Random generator = new Random(System.currentTimeMillis());
-				index=generator.nextInt(questions.size());
-			}while(questions.get(index).isAnswered());
+		if(oncePlayed){
+			int i;
+			for(i=0; i<askedQuestions.size();i++){
+				Question_Math ques= askedQuestions.get(i);
+				if(ques.getQuestion().equals(q.getQuestion())){
+					break;
+				}
 
-			return questions.get(index);
+			}
+			
+			i++;
+			if(i==askedQuestions.size()) 
+				i=0;
+			
+			for(int j=i; j<askedQuestions.size();j++){
+				Question_Math ques= askedQuestions.get(j);
+				if(!ques.isAnswered()){
+					return ques;
+				}
+			}
+			
+			for(int j=0; j<i;j++){
+				Question_Math ques= askedQuestions.get(j);
+				if(!ques.isAnswered()){
+					return ques;
+				}
+			}
 		}
-
+		return null;
 	}
 	public Question_Math getQuestion(int index){
 		if(index<questions.size())
