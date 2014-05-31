@@ -139,16 +139,50 @@ public class QuestionManager_Geography implements Serializable{
 	}
 
 	public Question_Geography getNextQuestionEurope(Question_Geography q){
-		boolean done=false;
-		for(Question_Geography ques: questionsEurope){
-			if(done==true)
-				return ques;
-			if(ques.getQuestion().equals(q.getQuestion())){
-				done =true;
+		if(!oncePlayed){
+			if(numberOfAskedQuestions>=maxNumberOfAskedQuestions){
+				oncePlayed=true;
+			}
+			else{
+
+				for(Question_Geography ques: questionsEurope){
+					if(ques.getQuestion().equals(q.getQuestion())){
+						ques.setAsked(true);
+						numberOfAskedQuestions++;
+					}
+				}
+
+				int number;
+
+				do{
+					Random generator = new Random(System.currentTimeMillis());
+					number=generator.nextInt(getQuestionsEurope().size());
+				}while(this.getQuestionsEurope().get(number).isAsked());
+
+				this.askedQuestions.add(getQuestionsEurope().get(number));
+
+				return getQuestionsEurope().get(number);
+			}
+		}
+		if(oncePlayed){
+			int i;
+			for(i=0; i<askedQuestions.size();i++){
+				Question_Geography ques= askedQuestions.get(i);
+				if(ques.getQuestion().equals(q.getQuestion())){
+					break;
+				}
+
+			}
+			i++;
+			if(i==askedQuestions.size()) i=0;
+			for(int j=i; j<askedQuestions.size();j++){
+				Question_Geography ques= askedQuestions.get(j);
+				if(!ques.isAnswered()){
+					return ques;
+				}
 			}
 		}
 		return null;
-
 	}
 
 

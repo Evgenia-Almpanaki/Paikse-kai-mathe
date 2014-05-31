@@ -33,10 +33,8 @@ public class GameGeographyState extends GameState{
 	private GameStateManager gsm;
 	private int width = GamePanel.WIDTH;
 	private int height = GamePanel.HEIGHT;
-	private int once;
 
 	public GameGeographyState(GameStateManager gsm){
-		once=0;
 		this.gsm = gsm;
 		backgroundPath="/Backgrounds/geo.jpg";
 		imagePath="/1/greece.jpg";
@@ -93,7 +91,7 @@ public class GameGeographyState extends GameState{
 	}
 	public void mouseClicked(int mouseType, int x, int y) {
 
-		if(checkButton.isClicked(x, y)){
+		if(checkButton.isClicked(x, y) && !displayMessage){
 			currentQuestion.setAnswered(true);
 
 			displayMessage = true; 
@@ -121,7 +119,7 @@ public class GameGeographyState extends GameState{
 			else if(difficulty==2)
 				currentQuestion=questionManager.getNextQuestionEurope(currentQuestion);
 		}
-		else if(ignoreButton.isClicked(x, y)){ 
+		else if(ignoreButton.isClicked(x, y) && !displayMessage){ 
 			if(difficulty==1){
 				currentQuestion=questionManager.getNextQuestionGreece(currentQuestion);
 				for(Question_Geography q:questionManager.getQuestionsGreece()){
@@ -246,18 +244,15 @@ public class GameGeographyState extends GameState{
 		}
 	}
 	public void init() {
-		once++;
 		questionManager.init();
 		questionManager.loadQuestions();
 		difficulty=gsm.getDifficulty();
 		player = gsm.getPlayer();
 
 		if(difficulty==1){
-			if(questionManager.getQuestionsGreece().size()>0){
-				if(once==2)
-					System.out.println();
+			if(questionManager.getQuestionsGreece().size()>0)
 				currentQuestion = questionManager.getNextQuestionGreece(new Question_Geography("", new Point(0,0)));
-			}}
+		}
 		else if(difficulty==2){
 			if(questionManager.getQuestionsEurope().size()>0)
 				currentQuestion = questionManager.getNextQuestionEurope(new Question_Geography("", new Point(0,0)));

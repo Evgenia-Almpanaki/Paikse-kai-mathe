@@ -12,7 +12,7 @@ import Main.GamePanel;
 /* Αυτή η κλάση αναπαριστά ένα textfield του παιχνιδιού. Κατα την δημιουργία ενός τέτοιου αντικειμένου,
  * δίνεται και η διεύθηνση προορισμού μιας εικόνας, για την υλοποίηση του textfield. Το textfield μπορεί 
  * να κρατήσει το μεγεθός του και τις συντεταγμένες στις οποίες θα ζωγραφιστεί πάνω στην οθόνη, για λόγους
- *αναγνώρισης του.
+ * αναγνώρισης του.
  */
 
 public class GameTextField {
@@ -93,7 +93,7 @@ public class GameTextField {
 	//event for typing input
 	public void keyPressed(int keyCode){
 		
-		if(keyCode >= 65 && keyCode <= 90){
+		if(keyCode >= 48 && keyCode <= 90){
 			boolean capsLockIsON = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
 			if(capsLockIsON)
 				input += KeyEvent.getKeyText(keyCode);
