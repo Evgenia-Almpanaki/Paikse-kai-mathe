@@ -46,7 +46,11 @@ public class InputState extends GameState {
 		bg.render(g);
 		g.setColor(Color.ORANGE.darker());
 		g.drawString(message, GamePanel.WIDTH/2 - g.getFontMetrics().stringWidth(message)/2, 100);
+		
+		inputField.setxInput(GamePanel.WIDTH/2 - inputField.getWidth()/2 + 17);
+		inputField.setyInput(GamePanel.HEIGHT/2 - inputField.getHeight()/2 + g.getFontMetrics().getHeight() + 10);
 		inputField.render(g);
+		
 		okButton.render(g);
 	}
 

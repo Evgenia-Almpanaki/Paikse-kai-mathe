@@ -11,10 +11,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
 import GameState.GameStateManager;
-import GameState.MenuState;
 
 @SuppressWarnings("serial")
 public class GamePanel extends JPanel implements Runnable, KeyListener, MouseListener , MouseMotionListener{
@@ -40,12 +39,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	public GamePanel(){
 		
 		super();
+		
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		WIDTH = (int) screenSize.getWidth();
 		HEIGHT = (int) screenSize.getHeight();
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		setFocusable(true);
-		requestFocus();
+		requestFocus();		
 		
 	}
 	

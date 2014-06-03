@@ -1,5 +1,6 @@
 package GameState;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -13,7 +14,6 @@ import Background.Background;
 import Entity.GameButton;
 import Entity.MessageBox;
 import Entity.Player;
-import Entity.QuestionManager;
 import Entity.QuestionManager_Geography;
 import Entity.Question_Geography;
 import Main.GamePanel;
@@ -22,27 +22,43 @@ import Main.GamePanel;
 public class GameGeographyState extends GameState{
 
 	private QuestionManager_Geography questionManager;
-	private String imagePath, backgroundPath;
+	private GameStateManager gsm;
+
+	private String imagePath, backgroundPath; 
+
 	private int difficulty=0;
+
 	private Background background;
-	private BufferedImage image;
-	private int xImage, yImage;
+	private BufferedImage image;	//χάρτης
+	private int xImage, yImage;		//x,y χάρτη
+
 	private Player player;
 	private MessageBox messageBox;
 	private GameButton checkButton, ignoreButton;
-	private Question_Geography currentQuestion;
-	private boolean displayMessage;
-	private GameStateManager gsm;
+	private Question_Geography currentQuestion;//τρέχουσα ερώτηση
+	private boolean displayMessage;//αν είναι ορατό το messageBox
+
 	private int width = GamePanel.WIDTH;
 	private int height = GamePanel.HEIGHT;
-	private boolean hasGameBeenPaused;
+
+	private boolean hasGameBeenPaused;//αν το παιχνίδι είναι σε παύση
+
+	private double fontSizeMeter=0;//μέτρο για το font-συναρτήσει πλάτους-ύψους
+	private Font font;
+	private Color color;
 
 	public GameGeographyState(GameStateManager gsm){
 		this.gsm = gsm;
+
 		backgroundPath="/Backgrounds/geo.jpg";
 		imagePath="/1/greece.jpg";
+
 		questionManager=new QuestionManager_Geography();
-		questionManager.loadQuestions();
+
+		//fonts & colors -τα fonts είναι συναρτήσει ύψους-πλάτους παραθύρου
+		fontSizeMeter=(width/(double)height);
+		font=new Font("Courier New", Font.BOLD,(int) (fontSizeMeter * 20));
+		color=Color.red.brighter();
 
 		// buttons
 		ignoreButton = new GameButton("/Textures/buttonNext.png");
@@ -65,7 +81,7 @@ public class GameGeographyState extends GameState{
 		try {
 			image=ImageIO.read(getClass().getResourceAsStream(imagePath));
 		} catch (IOException e) {
-			e.printStackTrace();
+
 		}
 
 		//init messageBox
@@ -78,27 +94,30 @@ public class GameGeographyState extends GameState{
 
 	@Override
 	public void update() {
+
 		difficulty=gsm.getDifficulty();
-		if(difficulty==1){
-			imagePath="/1/greece.jpg";
+
+		if(difficulty==1){ //αν είμαστε στην Ε' Δημοτικού, 
+			imagePath="/1/greece.jpg";//εμφανίζεται ο χάρτης της Ελλάδος
 		}
-		else if(difficulty==2){
-			imagePath="/2/europe.jpg";
+		else if(difficulty==2){//αν είμαστε στην Στ' Δημοτικού, 
+			imagePath="/2/europe.jpg";//εμφανίζεται ο χάρτης της Ευρώπης
 		}
+
 		try {
 			image=ImageIO.read(getClass().getResourceAsStream(imagePath));
 		} catch (IOException e) {
-			e.printStackTrace();
+
 		}
 
 	}
 	public void mouseClicked(int mouseType, int x, int y) {
-
+		//αν επιλεγεί το κουμπί ελέγχου & δεν είναι ορατό το messageBox
 		if(checkButton.isClicked(x, y) && !displayMessage){
-			currentQuestion.setAnswered(true);
-
+			//γίνεται ορατό το MessageBox
 			displayMessage = true; 
 
+			//αναζήτηση για το αν έχει επιλεγεί απάντηση
 			boolean atLeastOneQuestionSelected = false;
 			if(difficulty==1){
 				for(Question_Geography q: questionManager.getQuestionsGreece()){
@@ -112,16 +131,25 @@ public class GameGeographyState extends GameState{
 						atLeastOneQuestionSelected = true;
 				}
 			}
+			//αν έχει επιλεγεί η σωστή απάντηση
 			if(currentQuestion.isSelected() && atLeastOneQuestionSelected){
-				currentQuestion.setSelected(false);
-				messageBox.setMessage("Σωστό!");	
-				player.setTempScore(player.getTempScore()+1);
+
+				currentQuestion.setSelected(false);//ξε-επιλέγεται η απάντηση
+				messageBox.setMessage("Σωστό!");	//το MessageBox βγάζει το μήνυμα "Σωστό"
+				player.setTempScore(player.getTempScore()+1);//αυξάνεται το σκορ
+				currentQuestion.setAnswered(true);//η ερώτηση δηλώνεται ως απαντημένη
+
 			}
+			//αν δεν έχει επιλεγεί απάντηση
 			else if(!atLeastOneQuestionSelected){
+				//εμφανίζεται το μήνυμα "Διάλεξε"
 				messageBox.setMessage("Διάλεξε!");
 			}
 			else{
+				//αλλιώς εμφανίζεται το μήνυμα 'Λάθος'
 				messageBox.setMessage("Λάθος!");
+				
+				//σβήνει όποια απάντηση είναι επιλεγμένη
 				if(difficulty==1){
 					for(Question_Geography q:questionManager.getQuestionsGreece()){
 						q.setSelected(false);
@@ -132,13 +160,23 @@ public class GameGeographyState extends GameState{
 						q.setSelected(false);
 					}
 				}
+				//επιλέγεται η σωστή απάντηση
 				currentQuestion.setSelected(true);
+				//η ερώτηση δηλώνεται ως απαντημένη 
+				currentQuestion.setAnswered(true);
 			}
-			if(difficulty==1)
-				currentQuestion=questionManager.getNextQuestionGreece(currentQuestion);
-			else if(difficulty==2)
-				currentQuestion=questionManager.getNextQuestionEurope(currentQuestion);
+			//αν επιλεγεί απάντηση 
+			//προχωράμε στην επόμενη ερώτηση
+			if(atLeastOneQuestionSelected){
+				if(difficulty==1)
+					currentQuestion=questionManager.getNextQuestionGreece(currentQuestion);
+				else if(difficulty==2)
+					currentQuestion=questionManager.getNextQuestionEurope(currentQuestion);
+			}
 		}
+		//αν έχει πατηθεί το πλήκτρο αγνόησης και το messageBox δεν είναι ορατό
+		//επιλέγεται η επόμενη ερώτηση
+		//και σβήνει η επιλεγμένη ερώτηση
 		else if(ignoreButton.isClicked(x, y) && !displayMessage){ 
 			if(difficulty==1){
 				currentQuestion=questionManager.getNextQuestionGreece(currentQuestion);
@@ -152,26 +190,34 @@ public class GameGeographyState extends GameState{
 				}
 			}
 		} 
+		//αν πατηθεί το πλήκτρο 'εντάξει' στο messageBοx, τότε σβήνει
 		else if(displayMessage && messageBox.isOkButtonClicked(x, y)){ 
 			displayMessage= false; 
 		} 
 		else{
+			//αλλιώς γίνεται έλεγχος για το αν έχει επιλεγεί κάποια απάντηση
 			String selectedQuestion = null;
-
 
 			if(difficulty==1){
 
-				for(Question_Geography q:questionManager.getQuestionsGreece()){
+				for(Question_Geography q:questionManager.getQuestionsGreece()){//για κάθε ερώτηση
 
+					//επιλέγονται τα όρια για την κάθε απάντηση κουκκίδα
 					int minx=(int)(q.getPoint().x *(width/1000.0));
 					int miny=(int)(q.getPoint().y *(height/1000.0));
 					int maxx=10+(int)(q.getPoint().x *(width/1000.0));
 					int maxy=10+(int)(q.getPoint().y *(height/1000.0));
 
+					//αν η επιλογή έχει γίνει μέσα στα όρια, 
+					//η ερώτηση δηλώνεται ως απαντημένη
 					if(x>minx && y>miny && x<maxx && y<maxy){
 						selectedQuestion=q.getQuestion();
 					}
 				}
+				/*η επιλεγμένη ερώτηση δηλώνεται ως επιλεγμένη , 
+				 * ενώ ακυρώνονται όλες οι άλλες, έτσι ώστε μόνο 
+				 * μια ερώτηση να είναι επιλεγμένη κάθε φορά
+				 */
 				for(Question_Geography q:questionManager.getQuestionsGreece()){
 					if(q.getQuestion().equals(selectedQuestion)) 
 						q.setSelected(true); 
@@ -179,6 +225,7 @@ public class GameGeographyState extends GameState{
 						q.setSelected(false);
 				}
 			}
+			//αντίστοιχα με τις ερωτήσεις της Ελλάδας, γίνονται και της Ευρώπης για την Στ' Δημοτικού
 			else if(difficulty==2){
 
 				for(Question_Geography q:questionManager.getQuestionsEurope()){
@@ -206,28 +253,53 @@ public class GameGeographyState extends GameState{
 	}
 	public void render(Graphics2D g) {
 
+		//σχεδιάζεται το background και ο χάρτης
 		background.render(g);
 		g.drawImage(image, xImage, yImage,GamePanel.WIDTH/2,3 * (GamePanel.HEIGHT/4),null);
 
+		//αν τελειώσουν οι ερωτήσεις και δεν ειναι ορατο το messageBox, 
+		//εμφανίζεται το GAME_OVER_STATE
 		if(currentQuestion==null && !displayMessage)
 			gsm.setState(GameStateManager.GAME_OVER_STATE);
 
-		g.setColor(Color.MAGENTA);
+		g.setColor(color);
+		g.setFont(font);
+		
+		//καταγράφεται το σκορ
 		g.drawString("Βαθμοί: "+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
 
+		/*g.setFont(new Font("Chiller", Font.PLAIN,(int) (fontSizeMeter * 20)));
+		g.drawString("abc"+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
+		g.setFont(new Font("Curlz MT", Font.PLAIN,(int) (fontSizeMeter * 20)));
+		g.drawString("abc: "+player.getTempScore(), GamePanel.WIDTH/10, 2* GamePanel.HEIGHT/8);
+		g.setFont(new Font("Jokerman", Font.PLAIN,(int) (fontSizeMeter * 20)));
+		g.drawString("abc: "+player.getTempScore(), GamePanel.WIDTH/10, 3*GamePanel.HEIGHT/8);
+		g.setFont(new Font("Kristen ITC", Font.PLAIN,(int) (fontSizeMeter * 20)));
+		g.drawString("abc: "+player.getTempScore(), GamePanel.WIDTH/10, 4*GamePanel.HEIGHT/8);
+		g.setFont(new Font("Ravie", Font.PLAIN,(int) (fontSizeMeter * 20)));
+		g.drawString("abc: "+player.getTempScore(), GamePanel.WIDTH/10, 5*GamePanel.HEIGHT/8);
+		g.setFont(new Font("Snap ITC", Font.PLAIN,(int) (fontSizeMeter * 20)));
+		g.drawString("abc: "+player.getTempScore(), GamePanel.WIDTH/10, 6*GamePanel.HEIGHT/8);
+		 */
 
+		
 		if (displayMessage)
+			//εμφανίζεται το MessageBox
 			messageBox.render(g);
 		else {
-			renderQuestions(g);
+			//αλλιώς εμφανίζεται η ερώτηση και τα κουμπιά
+			renderQuestion(g);
 			checkButton.render(g);
 			ignoreButton.render(g);
 
 		}
 	}
 
-	public void renderQuestions(Graphics g) {
-		g.setColor(Color.red);
+	public void renderQuestion(Graphics g) {
+		
+		g.setColor(color);
+		g.setFont(font);
+
 		if(currentQuestion!=null){
 			// draw question
 			g.drawString(currentQuestion.getQuestion(), GamePanel.WIDTH/3, GamePanel.HEIGHT/8);
@@ -253,7 +325,10 @@ public class GameGeographyState extends GameState{
 			}
 		}
 	}
+	
 	public void init() {
+		//συνάρτηση αρχικοποίησης
+		
 		if(!hasGameBeenPaused){
 			questionManager.init();
 			questionManager.loadQuestions();
@@ -272,17 +347,17 @@ public class GameGeographyState extends GameState{
 		else{
 			hasGameBeenPaused = false;
 		}
-		
-		
+
+
 
 	}
-
 
 	public void setImagePath(String img){
 		imagePath=img;
 	}
 
 	public void keyPressed(int keyCode) {
+		//αν πατηθεί το ESC, τότε γίνεται μετακίνηση στο μενού παύσης
 		if(keyCode == KeyEvent.VK_ESCAPE){
 			PauseMenuState.setPreviousState(GameStateManager.GAME_GEOGRAPHY_STATE);
 			gsm.setState(GameStateManager.PAUSE_MENU_STATE);

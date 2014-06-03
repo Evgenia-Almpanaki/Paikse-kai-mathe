@@ -22,16 +22,23 @@ public class GameMathState extends GameState {
 
 	private Background bg;
 	private BufferedImage image;
+
 	private QuestionManager_Math questionManager;
+	private GameStateManager gsm;
+
 	private Player player;
 	private MessageBox messageBox;
 	private GameButton checkButton, ignoreButton;
 	private Question_Math currentQuestion;
+
 	private boolean displayMessage;
-	private GameStateManager gsm;
+
 	private GameTextField textfield;
 	private String input;
-	private Font inputFont, questionFont;
+
+	private Font inputFont, scoreFont;
+	private Color inputColor, scoreColor;
+
 	private boolean hasGameBeenPaused;
 
 	public GameMathState(GameStateManager gsm){
@@ -39,9 +46,11 @@ public class GameMathState extends GameState {
 		this.gsm = gsm;
 		questionManager=new QuestionManager_Math();
 
-		//fonts
-		inputFont=new Font(Font.MONOSPACED, Font.ITALIC , 33);
-		questionFont=questionManager.getQuestionFont();
+		//fonts & colors
+		inputFont=new Font(Font.MONOSPACED, Font.ITALIC , (int) (20 * GamePanel.WIDTH/(double)GamePanel.HEIGHT));
+		scoreFont=new Font("Courier New", Font.PLAIN , (int) (20 * GamePanel.WIDTH/(double)GamePanel.HEIGHT));
+		inputColor=Color.red.brighter();
+		scoreColor=Color.yellow.brighter();
 
 		//init background
 		bg=new Background("/Backgrounds/mathBackground.jpg",1);
@@ -49,9 +58,9 @@ public class GameMathState extends GameState {
 
 		//init image
 		try {
-			image=ImageIO.read(getClass().getResourceAsStream("/math.jpg"));
+			image=ImageIO.read(getClass().getResourceAsStream("/Backgrounds/math.jpg"));
 		} catch (IOException e) {
-			e.printStackTrace();
+
 		}
 
 		//init textfield
@@ -73,16 +82,24 @@ public class GameMathState extends GameState {
 		messageBox = new MessageBox();
 		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
 		displayMessage = false;
-		
+
 		hasGameBeenPaused = false;
 	}
 
 	@Override
 	public void init() {
-		
+
 		if(!hasGameBeenPaused){
 			questionManager.init();
-			questionManager.loadQuestions();
+			//ανάλογα με την τάξη-δυσκολία, επιλέγεται το κατάλληλο αρχείο
+			switch(gsm.getDifficulty()){
+			case 0: questionManager.loadQuestions("0");
+			break;
+			case 1: questionManager.loadQuestions("1");
+			break;
+			case 2: questionManager.loadQuestions("2");
+			break;
+			}
 
 			currentQuestion=questionManager.getNextQuestion(new Question_Math("",""));
 			player = gsm.getPlayer();
@@ -90,8 +107,8 @@ public class GameMathState extends GameState {
 		else{
 			hasGameBeenPaused = false;
 		}
-		
-		
+
+
 	}
 
 	@Override
@@ -102,37 +119,48 @@ public class GameMathState extends GameState {
 	@Override
 	public void render(Graphics2D g) {
 
-
+		//σχεδιάζεται το background και το textfield
 		bg.render(g);
 		textfield.render(g);
 
+		//σχεδιάζεται το πλαίσιο για το κείμενο-ερώτηση
 		g.drawImage(image, GamePanel.WIDTH/4, GamePanel.HEIGHT/4,GamePanel.WIDTH/2, GamePanel.HEIGHT/2,null);
 
-		g.setColor(Color.BLUE);
-		g.setFont(new Font("Arial", Font.BOLD, 33));
+		g.setColor(scoreColor);
+		g.setFont(scoreFont);
 
+		//καταγράφεται το σκορ
 		g.drawString("Βαθμοί: "+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
 
+		//αν τελειώσουν οι ερωτήσεις και δεν ειναι ορατο το messageBox, 
+		//εμφανίζεται το GAME_OVER_STATE
 		if(currentQuestion==null && !displayMessage) 
 			gsm.setState(GameStateManager.GAME_OVER_STATE);
 
 
 		if (displayMessage){
+
+			//εμφανίζεται το MessageBox & σβήνεται η απάντηση
 			messageBox.render(g);
-			g.drawString("  ", textfield.getX()+19, textfield.getY() + (int) (textfield.getHeight()/2.5) + 10);
+
+			textfield.setInput("");
+			textfield.setxInput(GamePanel.WIDTH/2 - textfield.getWidth()/2 + 17);
+			textfield.setyInput(GamePanel.HEIGHT/2 - textfield.getHeight()/2 + g.getFontMetrics().getHeight() + 10);
+			textfield.render(g);
+
 		}
 		else {
+
+			//αλλιώς εμφανίζεται η ερώτηση,το textfield και τα κουμπιά
 			checkButton.render(g);
 			ignoreButton.render(g);
 
+			g.setColor(inputColor);
 			g.setFont(inputFont);
-			int numberOfLettersAllowed=(int) (textfield.getWidth() * 0.8 )/g.getFontMetrics().getWidths()[0];
 
-			if(textfield.getText().length()<numberOfLettersAllowed)
-				g.drawString(textfield.getText(), textfield.getX()+19, textfield.getY() + (int) (textfield.getHeight()/2.5) + 10);
-			else
-				g.drawString(textfield.getText().substring(textfield.getText().length()-numberOfLettersAllowed, textfield.getText().length()), textfield.getX()+19, textfield.getY() + textfield.getHeight()/2 + 10);
-			g.setFont(questionFont);
+			textfield.setxInput(textfield.getX()+19);
+			textfield.setyInput(textfield.getY() + (int) (textfield.getHeight()/2.5) + 10);
+			textfield.render(g);
 
 			if(currentQuestion!=null)
 				questionManager.drawString(g, currentQuestion.getQuestion(),(int)(GamePanel.WIDTH*(290/1000.0)),(int)(GamePanel.HEIGHT*(330/1000.0)),(int)(GamePanel.WIDTH*(430/1000.0)));
@@ -142,27 +170,36 @@ public class GameMathState extends GameState {
 
 	@Override
 	public void mouseClicked(int mouseType, int x, int y) {
+		//αν επιλεγεί το κουμπί ελέγχου & δεν είναι ορατό το messageBox
 		if(checkButton.isClicked(x, y) && !displayMessage){	
 
-			input=textfield.getText();
-			currentQuestion.setAnswered(true);
-			
-			displayMessage = true;
+			displayMessage = true; //γίνεται ορατό το MessageBox
+			input=textfield.getText();//παίρνουμε το κείμενο που εισήχθε
+
+			//αν δεν έχει επιλεγεί απάντηση
 			if(input.trim().equals("")){
-				messageBox.setMessage("Απάντησε!");
+				messageBox.setMessage("Απάντησε!");//εμφανίζεται το μήνυμα "Απάντησε"
 			}
+			//αν έχει επιλεγεί η σωστή απάντηση
 			else if(currentQuestion.checkAnswer(input.trim())){
-				messageBox.setMessage("Σωστό!");	
-				player.setTempScore(player.getTempScore()+1);
-			}
+				messageBox.setMessage("Σωστό!");	//εμφανίζεται το μήνυμα "Σωστό"
+				player.setTempScore(player.getTempScore()+1);//αυξάνεται το σκορ κατά ένα
+				currentQuestion=questionManager.getNextQuestion(currentQuestion);//προχωράμε στην επόμενη ερώτηση
+				currentQuestion.setAnswered(true);//η ερώτηση δηλώνεται ως απαντημένη
+				}
 			else{
-				messageBox.setMessage("Λάθος!");
+				//αλλιώς εμφανίζεται το μήνυμα "Λάθος"
+				messageBox.setMessage("Λάθος! Σωστό: "+currentQuestion.getAnswer());//εμφανίζεται το μήνυμα "Λάθος" και εμφανίζεται και η σωστή απάντηση
+				currentQuestion=questionManager.getNextQuestion(currentQuestion);//προχωράμε στην επόμενη ερώτηση
+				currentQuestion.setAnswered(true);//η ερώτηση δηλώνεται ως απαντημένη
 			}
-			currentQuestion=questionManager.getNextQuestion(currentQuestion);
 		}
+		//αν έχει πατηθεί το πλήκτρο αγνόησης και το messageBox δεν είναι ορατό
+		//επιλέγεται η επόμενη ερώτηση
 		else if(ignoreButton.isClicked(x, y) && !displayMessage){ 
 			currentQuestion=questionManager.getNextQuestion(currentQuestion);
 		} 
+		//αν πατηθεί το πλήκτρο 'εντάξει' στο messageBοx, τότε σβήνει.
 		else if(displayMessage && messageBox.isOkButtonClicked(x, y)){ 
 			displayMessage= false; 
 		} 
@@ -171,13 +208,14 @@ public class GameMathState extends GameState {
 
 	@Override
 	public void keyPressed(int keyCode) {
+		//αν πατηθεί το ESC, τότε γίνεται μετακίνηση στο μενού παύσης
 		if(keyCode == KeyEvent.VK_ESCAPE){
 			PauseMenuState.setPreviousState(GameStateManager.GAME_MATH_STATE);
 			gsm.setState(GameStateManager.PAUSE_MENU_STATE);
 			hasGameBeenPaused = true;
 			return;
 		}
-		
+		//αλλιώw ενεργοποιείται το keyPressed του textfield
 		textfield.keyPressed(keyCode);
 
 	}

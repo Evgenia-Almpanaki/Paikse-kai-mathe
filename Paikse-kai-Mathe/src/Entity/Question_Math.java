@@ -2,10 +2,11 @@ package Entity;
 
 public class Question_Math {
 	
-	private String question;
-	private String answer; 
-	private boolean answered;
-	private boolean asked;
+	private String question;	//η ερώτηση σε μορφή String
+	private String answer; 		//η απάντηση σε μορφή String
+	private boolean answered;	//αν έχει απαντηθεί
+	private boolean asked;		//αν έχει ερωτηθεί
+	
 	public Question_Math(String q,String ans){
 		question=q;
 		answer=ans;
@@ -37,6 +38,7 @@ public class Question_Math {
 		return answer;
 	}
 	
+	//συνάρτηση που επιστρέφει αν το όρισμα ισούται με την απάντηση
 	public boolean checkAnswer(String s){
 		if(answer.trim().equals(s.trim()))
 			return true;

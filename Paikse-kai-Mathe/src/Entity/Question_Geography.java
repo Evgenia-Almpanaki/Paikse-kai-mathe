@@ -7,11 +7,11 @@ public class Question_Geography implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
-	private String question;
-	private Point pos; 
-	private boolean selected;
-	private boolean asked;
-	private boolean answered;
+	private String question;	//η ερώτηση σε μορφή String
+	private Point pos; 			//το σημείο που αντιστοιχεί στην απάντηση
+	private boolean selected;	//αν έχει επιλεγεί η απάντηση
+	private boolean asked;		//αν έχει ερωτηθεί η ερώτηση
+	private boolean answered;	//αν έχει απαντηθεί η ερώτηση
 	
 	public Question_Geography(String q,Point p){
 		question=q;
@@ -36,8 +36,6 @@ public class Question_Geography implements Serializable{
 	public void setAsked(boolean asked) {
 		this.asked = asked;
 	}
-
-	
 	
 	public String getQuestion(){
 		return question;
@@ -54,5 +52,4 @@ public class Question_Geography implements Serializable{
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
-
 }
