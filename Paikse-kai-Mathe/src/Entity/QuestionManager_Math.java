@@ -36,6 +36,10 @@ public class QuestionManager_Math {
 		return questionFont;
 	}
 
+	public Color getQuestionColor(){
+		return questionColor;
+	}
+	
 	public void init() {
 		//συνάρτηση αρχικοποίησης
 		questions = new ArrayList<Question_Math>();

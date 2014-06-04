@@ -95,9 +95,8 @@ public class GameTextField {
 	//event for typing input
 	public void keyPressed(int keyCode){
 
-		if((keyCode >= 48 && keyCode<=57) //πεζά αγγλικά
-				|| (keyCode >=65 &&keyCode <= 90//αριθμός
-				|| keyCode==188 || keyCode==190)){//κομμα η τελεια
+		if((keyCode >= 48 && keyCode<=57) //αριθμός
+				|| (keyCode >=65 &&keyCode <= 90)){//πεζά αγγλικά
 			boolean capsLockIsON = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
 			if(capsLockIsON)
 				input += KeyEvent.getKeyText(keyCode);

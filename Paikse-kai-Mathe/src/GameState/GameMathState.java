@@ -36,8 +36,8 @@ public class GameMathState extends GameState {
 	private GameTextField textfield;
 	private String input;
 
-	private Font inputFont, scoreFont;
-	private Color inputColor, scoreColor;
+	private Font inputFont, scoreFont,messageBoxFont;
+	private Color inputColor, scoreColor,messageBoxColor;
 
 	private boolean hasGameBeenPaused;
 
@@ -46,12 +46,20 @@ public class GameMathState extends GameState {
 		this.gsm = gsm;
 		questionManager=new QuestionManager_Math();
 
+		//init messageBox
+		messageBox = new MessageBox();
+		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
+		displayMessage = false;
+
 		//fonts & colors
 		inputFont=new Font(Font.MONOSPACED, Font.ITALIC , (int) (20 * GamePanel.WIDTH/(double)GamePanel.HEIGHT));
-		scoreFont=new Font("Courier New", Font.PLAIN , (int) (20 * GamePanel.WIDTH/(double)GamePanel.HEIGHT));
-		inputColor=Color.red.brighter();
-		scoreColor=Color.yellow.brighter();
+		scoreFont=new Font("Courier New", Font.BOLD , (int) (20 * GamePanel.WIDTH/(double)GamePanel.HEIGHT));
+		messageBoxFont=new Font("Courier New", Font.PLAIN , (int) (20 * messageBox.getWidth()/(double)messageBox.getHeight()));
 
+		inputColor=Color.red.brighter();
+		scoreColor=Color.blue.brighter();
+		messageBoxColor=Color.black;
+		
 		//init background
 		bg=new Background("/Backgrounds/mathBackground.jpg",1);
 		bg.setVector(0, 0);
@@ -66,7 +74,7 @@ public class GameMathState extends GameState {
 		//init textfield
 
 		textfield=new GameTextField("/Textures/textfield.png");
-		textfield.setX((int) (GamePanel.WIDTH/3.3));
+		textfield.setX((int) (GamePanel.WIDTH/2-textfield.getWidth()/2));
 		textfield.setY((int)(GamePanel.HEIGHT * (3/4.0)));
 
 		// buttons
@@ -77,11 +85,6 @@ public class GameMathState extends GameState {
 		checkButton = new GameButton("/Textures/buttonCheck.png");
 		checkButton.setX(GamePanel.WIDTH - checkButton.getWidth() - 10);
 		checkButton.setY(ignoreButton.getY() - checkButton.getHeight() - 10);
-
-		//init messageBox
-		messageBox = new MessageBox();
-		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
-		displayMessage = false;
 
 		hasGameBeenPaused = false;
 	}
@@ -137,9 +140,11 @@ public class GameMathState extends GameState {
 		if(currentQuestion==null && !displayMessage) 
 			gsm.setState(GameStateManager.GAME_OVER_STATE);
 
-
 		if (displayMessage){
 
+			g.setColor(messageBoxColor);
+			g.setFont(messageBoxFont);
+			
 			//εμφανίζεται το MessageBox & σβήνεται η απάντηση
 			messageBox.render(g);
 
@@ -175,7 +180,7 @@ public class GameMathState extends GameState {
 
 			displayMessage = true; //γίνεται ορατό το MessageBox
 			input=textfield.getText();//παίρνουμε το κείμενο που εισήχθε
-
+			
 			//αν δεν έχει επιλεγεί απάντηση
 			if(input.trim().equals("")){
 				messageBox.setMessage("Απάντησε!");//εμφανίζεται το μήνυμα "Απάντησε"
@@ -186,7 +191,7 @@ public class GameMathState extends GameState {
 				player.setTempScore(player.getTempScore()+1);//αυξάνεται το σκορ κατά ένα
 				currentQuestion=questionManager.getNextQuestion(currentQuestion);//προχωράμε στην επόμενη ερώτηση
 				currentQuestion.setAnswered(true);//η ερώτηση δηλώνεται ως απαντημένη
-				}
+			}
 			else{
 				//αλλιώς εμφανίζεται το μήνυμα "Λάθος"
 				messageBox.setMessage("Λάθος! Σωστό: "+currentQuestion.getAnswer());//εμφανίζεται το μήνυμα "Λάθος" και εμφανίζεται και η σωστή απάντηση
@@ -197,6 +202,7 @@ public class GameMathState extends GameState {
 		//αν έχει πατηθεί το πλήκτρο αγνόησης και το messageBox δεν είναι ορατό
 		//επιλέγεται η επόμενη ερώτηση
 		else if(ignoreButton.isClicked(x, y) && !displayMessage){ 
+			textfield.setInput("");
 			currentQuestion=questionManager.getNextQuestion(currentQuestion);
 		} 
 		//αν πατηθεί το πλήκτρο 'εντάξει' στο messageBοx, τότε σβήνει.
@@ -215,7 +221,7 @@ public class GameMathState extends GameState {
 			hasGameBeenPaused = true;
 			return;
 		}
-		//αλλιώw ενεργοποιείται το keyPressed του textfield
+		//αλλιώς ενεργοποιείται το keyPressed του textfield
 		textfield.keyPressed(keyCode);
 
 	}

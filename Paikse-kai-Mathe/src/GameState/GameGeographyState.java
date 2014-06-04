@@ -43,9 +43,8 @@ public class GameGeographyState extends GameState{
 
 	private boolean hasGameBeenPaused;//αν το παιχνίδι είναι σε παύση
 
-	private double fontSizeMeter=0;//μέτρο για το font-συναρτήσει πλάτους-ύψους
-	private Font font;
-	private Color color;
+	private Font font,messageBoxFont;
+	private Color color,messageBoxColor;
 
 	public GameGeographyState(GameStateManager gsm){
 		this.gsm = gsm;
@@ -55,10 +54,16 @@ public class GameGeographyState extends GameState{
 
 		questionManager=new QuestionManager_Geography();
 
+		//init messageBox
+		messageBox = new MessageBox();
+		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
+		displayMessage = false;
+
 		//fonts & colors -τα fonts είναι συναρτήσει ύψους-πλάτους παραθύρου
-		fontSizeMeter=(width/(double)height);
-		font=new Font("Courier New", Font.BOLD,(int) (fontSizeMeter * 20));
+		font=new Font("Courier New", Font.BOLD,(int) ((width/(double)height) * 20));
 		color=Color.red.brighter();
+		messageBoxColor=Color.black;
+		messageBoxFont=new Font("Courier New", Font.PLAIN , (int) (20 * messageBox.getWidth()/(double)messageBox.getHeight()));
 
 		// buttons
 		ignoreButton = new GameButton("/Textures/buttonNext.png");
@@ -83,11 +88,6 @@ public class GameGeographyState extends GameState{
 		} catch (IOException e) {
 
 		}
-
-		//init messageBox
-		messageBox = new MessageBox();
-		messageBox.setXandY(GamePanel.WIDTH / 2 - messageBox.getWidth() / 2,	GamePanel.HEIGHT / 2 - messageBox.getHeight() / 2);
-		displayMessage = false;
 
 		hasGameBeenPaused = false;
 	}
@@ -148,7 +148,7 @@ public class GameGeographyState extends GameState{
 			else{
 				//αλλιώς εμφανίζεται το μήνυμα 'Λάθος'
 				messageBox.setMessage("Λάθος!");
-				
+
 				//σβήνει όποια απάντηση είναι επιλεγμένη
 				if(difficulty==1){
 					for(Question_Geography q:questionManager.getQuestionsGreece()){
@@ -264,7 +264,7 @@ public class GameGeographyState extends GameState{
 
 		g.setColor(color);
 		g.setFont(font);
-		
+
 		//καταγράφεται το σκορ
 		g.drawString("Βαθμοί: "+player.getTempScore(), GamePanel.WIDTH/10, GamePanel.HEIGHT/8);
 
@@ -282,7 +282,9 @@ public class GameGeographyState extends GameState{
 		g.drawString("abc: "+player.getTempScore(), GamePanel.WIDTH/10, 6*GamePanel.HEIGHT/8);
 		 */
 
-		
+		g.setColor(messageBoxColor);
+		g.setFont(messageBoxFont);
+
 		if (displayMessage)
 			//εμφανίζεται το MessageBox
 			messageBox.render(g);
@@ -296,7 +298,7 @@ public class GameGeographyState extends GameState{
 	}
 
 	public void renderQuestion(Graphics g) {
-		
+
 		g.setColor(color);
 		g.setFont(font);
 
@@ -325,10 +327,10 @@ public class GameGeographyState extends GameState{
 			}
 		}
 	}
-	
+
 	public void init() {
 		//συνάρτηση αρχικοποίησης
-		
+
 		if(!hasGameBeenPaused){
 			questionManager.init();
 			questionManager.loadQuestions();
