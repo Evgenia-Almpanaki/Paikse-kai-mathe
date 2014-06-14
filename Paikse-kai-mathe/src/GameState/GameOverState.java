@@ -31,7 +31,7 @@ public class GameOverState extends GameState{
 
 	public void init() {
 		player = gsm.getPlayer();
-		tempScore = "Το σκόρ σου έιναι: " + player.getTempScore();
+		tempScore = "Το σκόρ σου είναι: " + player.getTempScore();
 		player.setTotalScore(player.getTotalScore() + player.getTempScore());
 		totalScore = "Το συνολικό σου σκόρ είναι: " + player.getTotalScore();
 		player.setTempScore(0);
